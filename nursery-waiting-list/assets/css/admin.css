@@ -1,0 +1,580 @@
+/**
+ * Nursery Waiting List - Admin Styles
+ */
+
+/* General Admin Styles */
+.nwl-admin-wrap {
+    max-width: 1400px;
+}
+
+.nwl-admin-wrap h1 {
+    margin-bottom: 20px;
+}
+
+/* Quick Stats Bar */
+.nwl-quick-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.nwl-stat-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 20px;
+    background: #f9f9f9;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s;
+}
+
+.nwl-stat-box:hover,
+.nwl-stat-box.active {
+    background: #4A90A4;
+    color: #fff;
+    border-color: #4A90A4;
+}
+
+.nwl-stat-count {
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.nwl-stat-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    opacity: 0.8;
+}
+
+/* Filters */
+.nwl-filters-form {
+    background: #fff;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.nwl-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: flex-end;
+}
+
+.nwl-filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.nwl-filter-group label {
+    font-weight: 500;
+    font-size: 12px;
+    color: #666;
+}
+
+.nwl-filter-group select,
+.nwl-filter-group input {
+    min-width: 150px;
+}
+
+.nwl-search-group input {
+    min-width: 200px;
+}
+
+.nwl-filter-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.nwl-results-count {
+    color: #666;
+    margin-bottom: 15px;
+}
+
+/* Bulk Actions */
+.nwl-bulk-actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    padding: 10px 0;
+}
+
+/* Entries Table */
+.nwl-entries-table .check-column {
+    width: 30px;
+}
+
+.nwl-entries-table .nwl-wl-number {
+    font-weight: 600;
+    color: #2271b1;
+    text-decoration: none;
+}
+
+.nwl-entries-table .nwl-actions {
+    white-space: nowrap;
+}
+
+.nwl-entries-table tr.nwl-deletion-requested {
+    background-color: #fff3cd;
+}
+
+.nwl-no-entries {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+}
+
+/* Status Badges */
+.nwl-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    background: #e0e0e0;
+    color: #333;
+}
+
+.nwl-badge-pending { background: #fff3cd; color: #856404; }
+.nwl-badge-contacted { background: #d1ecf1; color: #0c5460; }
+.nwl-badge-waitlisted { background: #d4edda; color: #155724; }
+.nwl-badge-offered { background: #4A90A4; color: #fff; }
+.nwl-badge-accepted { background: #28a745; color: #fff; }
+.nwl-badge-enrolled { background: #28a745; color: #fff; }
+.nwl-badge-declined { background: #f8d7da; color: #721c24; }
+.nwl-badge-removed { background: #6c757d; color: #fff; }
+
+.nwl-badge-info { background: #17a2b8; color: #fff; }
+.nwl-badge-success { background: #28a745; color: #fff; }
+.nwl-badge-warning { background: #ffc107; color: #212529; }
+.nwl-badge-error { background: #dc3545; color: #fff; }
+
+.nwl-priority-high { background: #ffc107; color: #212529; }
+.nwl-priority-urgent { background: #dc3545; color: #fff; }
+
+/* Edit Container */
+.nwl-edit-container {
+    display: flex;
+    gap: 30px;
+    margin-top: 20px;
+}
+
+.nwl-edit-main {
+    flex: 1;
+    min-width: 0;
+}
+
+.nwl-edit-sidebar {
+    width: 320px;
+    flex-shrink: 0;
+}
+
+/* Form Sections */
+.nwl-form-section {
+    background: #fff;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.nwl-form-section h2 {
+    margin: 0 0 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    font-size: 16px;
+}
+
+.nwl-form-row {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 15px;
+}
+
+.nwl-form-field {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.nwl-form-field.nwl-full-width {
+    flex: 0 0 100%;
+}
+
+.nwl-form-field label {
+    font-weight: 500;
+    color: #23282d;
+}
+
+.nwl-form-field label .required {
+    color: #dc3545;
+}
+
+.nwl-form-field input[type="text"],
+.nwl-form-field input[type="email"],
+.nwl-form-field input[type="tel"],
+.nwl-form-field input[type="date"],
+.nwl-form-field input[type="number"],
+.nwl-form-field select,
+.nwl-form-field textarea {
+    width: 100%;
+}
+
+.nwl-form-field .description {
+    font-size: 12px;
+    color: #666;
+    margin-top: 5px;
+}
+
+.nwl-form-actions {
+    padding: 20px;
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    display: flex;
+    gap: 10px;
+}
+
+/* Sidebar Boxes */
+.nwl-sidebar-box {
+    background: #fff;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 15px;
+}
+
+.nwl-sidebar-box h3 {
+    margin: 0 0 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+}
+
+.nwl-sidebar-field {
+    margin-bottom: 15px;
+}
+
+.nwl-sidebar-field label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.nwl-sidebar-field select,
+.nwl-sidebar-field input {
+    width: 100%;
+}
+
+.nwl-quick-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.nwl-quick-actions .button {
+    text-align: center;
+}
+
+/* Notes */
+.nwl-add-note-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.nwl-notes-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.nwl-note {
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    background: #f9f9f9;
+    border-left: 3px solid #ddd;
+}
+
+.nwl-note-internal { border-left-color: #6c757d; }
+.nwl-note-public { border-left-color: #28a745; }
+.nwl-note-system { border-left-color: #17a2b8; }
+.nwl-note-email { border-left-color: #4A90A4; }
+
+.nwl-note-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 8px;
+    font-size: 11px;
+    color: #666;
+}
+
+.nwl-note-type-badge {
+    background: #e0e0e0;
+    padding: 2px 8px;
+    border-radius: 10px;
+    text-transform: uppercase;
+    font-weight: 500;
+}
+
+.nwl-note-content {
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+/* Reports Page */
+.nwl-reports-page .nwl-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.nwl-stat-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.nwl-stat-icon {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #4A90A4;
+    color: #fff;
+    border-radius: 50%;
+}
+
+.nwl-stat-icon .dashicons {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+}
+
+.nwl-stat-card .nwl-stat-number {
+    display: block;
+    font-size: 28px;
+    font-weight: 600;
+    color: #23282d;
+}
+
+.nwl-stat-card .nwl-stat-label {
+    display: block;
+    font-size: 13px;
+    color: #666;
+}
+
+.nwl-reports-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.nwl-report-section {
+    background: #fff;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.nwl-report-section.nwl-full-width {
+    grid-column: 1 / -1;
+}
+
+.nwl-report-section h2 {
+    margin: 0 0 15px;
+    font-size: 16px;
+}
+
+.nwl-chart-container {
+    height: 300px;
+}
+
+.nwl-progress-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.nwl-progress {
+    height: 8px;
+    background: #4A90A4;
+    border-radius: 4px;
+    transition: width 0.3s;
+}
+
+/* Attention Boxes */
+.nwl-attention-box {
+    padding: 15px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+}
+
+.nwl-attention-box h3 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 10px;
+    font-size: 14px;
+}
+
+.nwl-attention-box ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.nwl-attention-box li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+
+.nwl-attention-box li:last-child {
+    border-bottom: none;
+}
+
+.nwl-attention-urgent { background: #f8d7da; border-left: 4px solid #dc3545; }
+.nwl-attention-high { background: #fff3cd; border-left: 4px solid #ffc107; }
+.nwl-attention-info { background: #d1ecf1; border-left: 4px solid #17a2b8; }
+.nwl-attention-warning { background: #fff3cd; border-left: 4px solid #856404; }
+
+/* Modal */
+.nwl-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 100000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nwl-modal-content {
+    background: #fff;
+    border-radius: 8px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow: auto;
+}
+
+.nwl-modal-large {
+    max-width: 800px;
+}
+
+.nwl-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid #ddd;
+}
+
+.nwl-modal-header h2 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.nwl-modal-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+}
+
+.nwl-modal-body {
+    padding: 20px;
+}
+
+/* GDPR Stats */
+.nwl-gdpr-overview {
+    margin-bottom: 30px;
+}
+
+.nwl-gdpr-stats {
+    display: flex;
+    gap: 20px;
+}
+
+.nwl-gdpr-stat {
+    flex: 1;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.nwl-gdpr-stat .nwl-stat-number {
+    display: block;
+    font-size: 32px;
+    font-weight: 600;
+    color: #4A90A4;
+}
+
+.nwl-gdpr-stat .nwl-stat-label {
+    display: block;
+    margin-top: 5px;
+    color: #666;
+}
+
+/* Responsive */
+@media screen and (max-width: 1200px) {
+    .nwl-edit-container {
+        flex-direction: column;
+    }
+    
+    .nwl-edit-sidebar {
+        width: 100%;
+    }
+    
+    .nwl-reports-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media screen and (max-width: 782px) {
+    .nwl-form-row {
+        flex-direction: column;
+    }
+    
+    .nwl-filters {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .nwl-filter-group select,
+    .nwl-filter-group input {
+        min-width: 100%;
+    }
+    
+    .nwl-quick-stats {
+        flex-direction: column;
+    }
+}

@@ -1,0 +1,425 @@
+/**
+ * Nursery Waiting List - Public Styles
+ */
+
+/* Container */
+.nwl-lookup-container {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 0 20px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+}
+
+/* Header */
+.nwl-lookup-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.nwl-lookup-title {
+    font-size: 28px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0 0 10px;
+}
+
+.nwl-lookup-description {
+    font-size: 16px;
+    color: #666;
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* Form */
+.nwl-lookup-form {
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.nwl-form-group {
+    margin-bottom: 20px;
+}
+
+.nwl-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+/* Type Toggle */
+.nwl-lookup-type-toggle {
+    display: flex;
+    gap: 10px;
+}
+
+.nwl-type-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: #f5f5f5;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.nwl-type-btn:hover {
+    background: #eee;
+    border-color: #ccc;
+}
+
+.nwl-type-btn.active {
+    background: #4A90A4;
+    border-color: #4A90A4;
+    color: #fff;
+}
+
+.nwl-type-btn svg {
+    flex-shrink: 0;
+}
+
+/* Input */
+.nwl-input {
+    width: 100%;
+    padding: 14px 16px;
+    font-size: 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+}
+
+.nwl-input:focus {
+    outline: none;
+    border-color: #4A90A4;
+    box-shadow: 0 0 0 3px rgba(74, 144, 164, 0.15);
+}
+
+.nwl-input::placeholder {
+    color: #999;
+}
+
+/* Submit Button */
+.nwl-submit-btn {
+    width: 100%;
+    padding: 14px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+    background: linear-gradient(135deg, #4A90A4 0%, #3a7a8f 100%);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.nwl-submit-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(74, 144, 164, 0.3);
+}
+
+.nwl-submit-btn:active {
+    transform: translateY(0);
+}
+
+.nwl-submit-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.nwl-btn-loading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nwl-spinner {
+    animation: nwl-spin 1s linear infinite;
+}
+
+@keyframes nwl-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Results */
+.nwl-lookup-results {
+    margin-top: 30px;
+}
+
+.nwl-results-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Result Card */
+.nwl-result-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.nwl-result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 20px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #fff 100%);
+    border-bottom: 1px solid #eee;
+}
+
+.nwl-child-info {
+    flex: 1;
+}
+
+.nwl-child-name {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0 0 5px;
+}
+
+.nwl-wl-number {
+    font-size: 13px;
+    color: #666;
+    font-family: monospace;
+    background: #f0f0f0;
+    padding: 3px 8px;
+    border-radius: 4px;
+}
+
+/* Status Badge */
+.nwl-status-badge {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-info {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+.status-success {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-warning {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-error {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.status-default {
+    background: #e9ecef;
+    color: #495057;
+}
+
+/* Result Details */
+.nwl-result-details {
+    padding: 20px;
+}
+
+.nwl-detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.nwl-detail-row:last-child {
+    border-bottom: none;
+}
+
+.nwl-detail-label {
+    font-size: 14px;
+    color: #666;
+}
+
+.nwl-detail-value {
+    font-size: 14px;
+    font-weight: 500;
+    color: #1a1a1a;
+}
+
+.nwl-deadline .nwl-deadline-date {
+    color: #dc3545;
+    font-weight: 600;
+}
+
+/* Result Notes */
+.nwl-result-notes {
+    padding: 15px 20px;
+    background: #f8f9fa;
+    border-top: 1px solid #eee;
+}
+
+.nwl-result-notes strong {
+    font-size: 13px;
+    color: #666;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.nwl-result-notes p {
+    margin: 0;
+    font-size: 14px;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* Results Footer */
+.nwl-results-footer {
+    text-align: center;
+    margin-top: 25px;
+    padding-top: 25px;
+    border-top: 1px solid #eee;
+}
+
+.nwl-results-footer p {
+    font-size: 14px;
+    color: #666;
+    margin: 0 0 15px;
+}
+
+.nwl-new-search-btn {
+    padding: 12px 30px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #4A90A4;
+    background: #fff;
+    border: 2px solid #4A90A4;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.nwl-new-search-btn:hover {
+    background: #4A90A4;
+    color: #fff;
+}
+
+/* Error/Not Found Message */
+.nwl-error-message {
+    text-align: center;
+    padding: 40px 20px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.nwl-error-message .nwl-error-icon {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 20px;
+    background: #f8d7da;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nwl-error-message .nwl-error-icon svg {
+    color: #dc3545;
+}
+
+.nwl-error-message h3 {
+    font-size: 18px;
+    color: #1a1a1a;
+    margin: 0 0 10px;
+}
+
+.nwl-error-message p {
+    font-size: 14px;
+    color: #666;
+    margin: 0;
+}
+
+/* Responsive */
+@media screen and (max-width: 600px) {
+    .nwl-lookup-container {
+        margin: 20px auto;
+        padding: 0 15px;
+    }
+
+    .nwl-lookup-form {
+        padding: 20px;
+    }
+
+    .nwl-lookup-title {
+        font-size: 24px;
+    }
+
+    .nwl-lookup-type-toggle {
+        flex-direction: column;
+    }
+
+    .nwl-result-header {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .nwl-detail-row {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .nwl-detail-label {
+        font-size: 12px;
+    }
+}
+
+/* Animation for loading */
+@keyframes nwl-fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.nwl-result-card {
+    animation: nwl-fadeIn 0.3s ease;
+}
+
+.nwl-results-list .nwl-result-card:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.nwl-results-list .nwl-result-card:nth-child(3) {
+    animation-delay: 0.2s;
+}
