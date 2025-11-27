@@ -21,14 +21,6 @@ class NWL_Email {
     private function __construct() {
         add_action('nwl_entry_created', array($this, 'send_registration_email'), 10, 2);
         add_action('nwl_status_changed', array($this, 'on_status_change'), 10, 3);
-        add_filter('wp_mail_content_type', array($this, 'set_html_content_type'));
-    }
-
-    /**
-     * Set HTML content type for emails
-     */
-    public function set_html_content_type() {
-        return 'text/html';
     }
 
     /**
@@ -313,20 +305,19 @@ class NWL_Email {
             '{{parent_email}}' => $entry->parent_email,
             '{{parent_phone}}' => $entry->parent_phone,
             '{{date_added}}' => date_i18n(get_option('date_format'), strtotime($entry->created_at)),
-            '{{room_requested}}' => $entry_handler->get_room_label($entry->room_requested),
             '{{age_group}}' => $entry->age_group,
             '{{preferred_start_date}}' => $entry->preferred_start_date ? date_i18n(get_option('date_format'), strtotime($entry->preferred_start_date)) : '',
             '{{status}}' => $entry_handler->get_status_label($entry->status),
             '{{public_notes}}' => $entry->public_notes,
             '{{offer_deadline}}' => $entry->offer_deadline ? date_i18n(get_option('date_format'), strtotime($entry->offer_deadline)) : '',
-            
+
             // Nursery details
             '{{nursery_name}}' => $nursery_name,
             '{{nursery_email}}' => $nursery_email,
             '{{nursery_phone}}' => $nursery_phone,
             '{{nursery_address}}' => $nursery_address,
             '{{stats_page_url}}' => $stats_page,
-            
+
             // Extra content
             '{{message_content}}' => isset($extra['message_content']) ? $extra['message_content'] : '',
         );
@@ -446,16 +437,16 @@ class NWL_Email {
                 '{{child_first_name}}' => __('Child\'s first name', 'nursery-waiting-list'),
                 '{{child_last_name}}' => __('Child\'s last name', 'nursery-waiting-list'),
                 '{{child_dob}}' => __('Child\'s date of birth', 'nursery-waiting-list'),
-                '{{parent_name}}' => __('Parent\'s full name', 'nursery-waiting-list'),
-                '{{parent_first_name}}' => __('Parent\'s first name', 'nursery-waiting-list'),
-                '{{parent_last_name}}' => __('Parent\'s last name', 'nursery-waiting-list'),
-                '{{parent_email}}' => __('Parent\'s email', 'nursery-waiting-list'),
-                '{{parent_phone}}' => __('Parent\'s phone number', 'nursery-waiting-list'),
+                '{{parent_name}}' => __('Parent/carer\'s full name', 'nursery-waiting-list'),
+                '{{parent_first_name}}' => __('Parent/carer\'s first name', 'nursery-waiting-list'),
+                '{{parent_last_name}}' => __('Parent/carer\'s last name', 'nursery-waiting-list'),
+                '{{parent_email}}' => __('Parent/carer\'s email', 'nursery-waiting-list'),
+                '{{parent_phone}}' => __('Parent/carer\'s phone number', 'nursery-waiting-list'),
                 '{{date_added}}' => __('Date added to waiting list', 'nursery-waiting-list'),
-                '{{room_requested}}' => __('Room/age group requested', 'nursery-waiting-list'),
+                '{{age_group}}' => __('Age group', 'nursery-waiting-list'),
                 '{{preferred_start_date}}' => __('Preferred start date', 'nursery-waiting-list'),
                 '{{status}}' => __('Current status', 'nursery-waiting-list'),
-                '{{public_notes}}' => __('Public notes (visible to parents)', 'nursery-waiting-list'),
+                '{{public_notes}}' => __('Public notes (visible to parents/carers)', 'nursery-waiting-list'),
                 '{{offer_deadline}}' => __('Offer response deadline', 'nursery-waiting-list'),
             ),
             __('Nursery Details', 'nursery-waiting-list') => array(

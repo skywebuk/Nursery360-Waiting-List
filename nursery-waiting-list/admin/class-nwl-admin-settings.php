@@ -43,9 +43,6 @@ class NWL_Admin_Settings {
         // GDPR Settings
         register_setting('nwl_gdpr_settings', 'nwl_data_retention_days');
         register_setting('nwl_gdpr_settings', 'nwl_auto_delete_removed');
-
-        // Rooms Settings
-        register_setting('nwl_rooms_settings', 'nwl_custom_rooms');
     }
 
     /**
@@ -63,23 +60,19 @@ class NWL_Admin_Settings {
             <h1><?php esc_html_e('Waiting List Settings', 'nursery-waiting-list'); ?></h1>
 
             <nav class="nav-tab-wrapper">
-                <a href="<?php echo esc_url(add_query_arg('tab', 'general')); ?>" 
+                <a href="<?php echo esc_url(add_query_arg('tab', 'general')); ?>"
                    class="nav-tab <?php echo $active_tab === 'general' ? 'nav-tab-active' : ''; ?>">
                     <?php esc_html_e('General', 'nursery-waiting-list'); ?>
                 </a>
-                <a href="<?php echo esc_url(add_query_arg('tab', 'email')); ?>" 
+                <a href="<?php echo esc_url(add_query_arg('tab', 'email')); ?>"
                    class="nav-tab <?php echo $active_tab === 'email' ? 'nav-tab-active' : ''; ?>">
                     <?php esc_html_e('Email', 'nursery-waiting-list'); ?>
                 </a>
-                <a href="<?php echo esc_url(add_query_arg('tab', 'rooms')); ?>" 
-                   class="nav-tab <?php echo $active_tab === 'rooms' ? 'nav-tab-active' : ''; ?>">
-                    <?php esc_html_e('Rooms', 'nursery-waiting-list'); ?>
-                </a>
-                <a href="<?php echo esc_url(add_query_arg('tab', 'gdpr')); ?>" 
+                <a href="<?php echo esc_url(add_query_arg('tab', 'gdpr')); ?>"
                    class="nav-tab <?php echo $active_tab === 'gdpr' ? 'nav-tab-active' : ''; ?>">
                     <?php esc_html_e('GDPR & Privacy', 'nursery-waiting-list'); ?>
                 </a>
-                <a href="<?php echo esc_url(add_query_arg('tab', 'gravity-forms')); ?>" 
+                <a href="<?php echo esc_url(add_query_arg('tab', 'gravity-forms')); ?>"
                    class="nav-tab <?php echo $active_tab === 'gravity-forms' ? 'nav-tab-active' : ''; ?>">
                     <?php esc_html_e('Gravity Forms', 'nursery-waiting-list'); ?>
                 </a>
@@ -90,9 +83,6 @@ class NWL_Admin_Settings {
                 switch ($active_tab) {
                     case 'email':
                         self::render_email_settings();
-                        break;
-                    case 'rooms':
-                        self::render_rooms_settings();
                         break;
                     case 'gdpr':
                         self::render_gdpr_settings();
@@ -285,111 +275,6 @@ class NWL_Admin_Settings {
                 }
             }
         }
-    }
-
-    /**
-     * Render rooms settings
-     */
-    private static function render_rooms_settings() {
-        if (isset($_POST['nwl_save_rooms']) && wp_verify_nonce($_POST['nwl_rooms_nonce'], 'nwl_save_rooms')) {
-            $custom_rooms = array();
-            if (!empty($_POST['room_key']) && !empty($_POST['room_name'])) {
-                foreach ($_POST['room_key'] as $i => $key) {
-                    $key = sanitize_key($key);
-                    $name = sanitize_text_field($_POST['room_name'][$i]);
-                    if ($key && $name) {
-                        $custom_rooms[$key] = $name;
-                    }
-                }
-            }
-            update_option('nwl_custom_rooms', $custom_rooms);
-            
-            echo '<div class="notice notice-success"><p>' . esc_html__('Settings saved.', 'nursery-waiting-list') . '</p></div>';
-        }
-
-        $default_rooms = array(
-            'baby' => __('Baby Room (0-12 months)', 'nursery-waiting-list'),
-            'toddler' => __('Toddler Room (1-2 years)', 'nursery-waiting-list'),
-            'tweenies' => __('Tweenies Room (2-3 years)', 'nursery-waiting-list'),
-            'preschool' => __('Pre-School Room (3-4 years)', 'nursery-waiting-list'),
-        );
-        
-        $custom_rooms = get_option('nwl_custom_rooms', array());
-        ?>
-        <h2><?php esc_html_e('Default Rooms', 'nursery-waiting-list'); ?></h2>
-        <p><?php esc_html_e('These are the default room options. They cannot be edited but can be supplemented with custom rooms below.', 'nursery-waiting-list'); ?></p>
-        
-        <table class="widefat" style="max-width: 600px;">
-            <thead>
-                <tr>
-                    <th><?php esc_html_e('Key', 'nursery-waiting-list'); ?></th>
-                    <th><?php esc_html_e('Name', 'nursery-waiting-list'); ?></th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($default_rooms as $key => $name) : ?>
-                    <tr>
-                        <td><code><?php echo esc_html($key); ?></code></td>
-                        <td><?php echo esc_html($name); ?></td>
-                    </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-
-        <h2 style="margin-top: 30px;"><?php esc_html_e('Custom Rooms', 'nursery-waiting-list'); ?></h2>
-        <p><?php esc_html_e('Add custom rooms specific to your nursery.', 'nursery-waiting-list'); ?></p>
-        
-        <form method="post">
-            <?php wp_nonce_field('nwl_save_rooms', 'nwl_rooms_nonce'); ?>
-            
-            <table class="widefat nwl-custom-rooms-table" style="max-width: 600px;">
-                <thead>
-                    <tr>
-                        <th><?php esc_html_e('Key', 'nursery-waiting-list'); ?></th>
-                        <th><?php esc_html_e('Name', 'nursery-waiting-list'); ?></th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody id="nwl-custom-rooms">
-                    <?php if (!empty($custom_rooms)) : ?>
-                        <?php foreach ($custom_rooms as $key => $name) : ?>
-                            <tr>
-                                <td><input type="text" name="room_key[]" value="<?php echo esc_attr($key); ?>" class="regular-text"></td>
-                                <td><input type="text" name="room_name[]" value="<?php echo esc_attr($name); ?>" class="regular-text"></td>
-                                <td><button type="button" class="button nwl-remove-room">&times;</button></td>
-                            </tr>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                </tbody>
-            </table>
-            
-            <p>
-                <button type="button" id="nwl-add-room" class="button"><?php esc_html_e('Add Room', 'nursery-waiting-list'); ?></button>
-            </p>
-
-            <p class="submit">
-                <input type="submit" name="nwl_save_rooms" class="button button-primary" value="<?php esc_attr_e('Save Rooms', 'nursery-waiting-list'); ?>">
-            </p>
-        </form>
-
-        <script>
-        jQuery(document).ready(function($) {
-            $('#nwl-add-room').on('click', function() {
-                $('#nwl-custom-rooms').append(
-                    '<tr>' +
-                    '<td><input type="text" name="room_key[]" class="regular-text" placeholder="<?php esc_attr_e('e.g. after_school', 'nursery-waiting-list'); ?>"></td>' +
-                    '<td><input type="text" name="room_name[]" class="regular-text" placeholder="<?php esc_attr_e('e.g. After School Club', 'nursery-waiting-list'); ?>"></td>' +
-                    '<td><button type="button" class="button nwl-remove-room">&times;</button></td>' +
-                    '</tr>'
-                );
-            });
-
-            $(document).on('click', '.nwl-remove-room', function() {
-                $(this).closest('tr').remove();
-            });
-        });
-        </script>
-        <?php
     }
 
     /**

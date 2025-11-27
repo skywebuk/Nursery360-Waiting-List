@@ -24,6 +24,7 @@ class NWL_Admin_Entries {
         add_action('wp_ajax_nwl_delete_entry', array($this, 'ajax_delete_entry'));
         add_action('wp_ajax_nwl_bulk_action', array($this, 'ajax_bulk_action'));
         add_action('wp_ajax_nwl_save_entry', array($this, 'ajax_save_entry'));
+        add_action('wp_ajax_nwl_cancel_deletion', array($this, 'ajax_cancel_deletion'));
     }
 
     /**
@@ -39,7 +40,6 @@ class NWL_Admin_Entries {
         // Get filters
         $filters = array(
             'status' => isset($_GET['status']) ? sanitize_text_field($_GET['status']) : '',
-            'room' => isset($_GET['room']) ? sanitize_text_field($_GET['room']) : '',
             'age_group' => isset($_GET['age_group']) ? sanitize_text_field($_GET['age_group']) : '',
             'date_from' => isset($_GET['date_from']) ? sanitize_text_field($_GET['date_from']) : '',
             'date_to' => isset($_GET['date_to']) ? sanitize_text_field($_GET['date_to']) : '',
@@ -96,11 +96,11 @@ class NWL_Admin_Entries {
                     </div>
 
                     <div class="nwl-filter-group">
-                        <label><?php esc_html_e('Room:', 'nursery-waiting-list'); ?></label>
-                        <select name="room">
-                            <option value=""><?php esc_html_e('All Rooms', 'nursery-waiting-list'); ?></option>
-                            <?php foreach (NWL_Database::get_rooms() as $key => $label) : ?>
-                                <option value="<?php echo esc_attr($key); ?>" <?php selected($filters['room'], $key); ?>>
+                        <label><?php esc_html_e('Age Group:', 'nursery-waiting-list'); ?></label>
+                        <select name="age_group">
+                            <option value=""><?php esc_html_e('All Age Groups', 'nursery-waiting-list'); ?></option>
+                            <?php foreach (NWL_Database::get_age_groups() as $key => $label) : ?>
+                                <option value="<?php echo esc_attr($key); ?>" <?php selected($filters['age_group'], $key); ?>>
                                     <?php echo esc_html($label); ?>
                                 </option>
                             <?php endforeach; ?>
@@ -172,10 +172,9 @@ class NWL_Admin_Entries {
                             <td class="check-column">
                                 <input type="checkbox" id="nwl-select-all">
                             </td>
-                            <th><?php esc_html_e('WL Number', 'nursery-waiting-list'); ?></th>
+                            <th><?php esc_html_e('Reference', 'nursery-waiting-list'); ?></th>
                             <th><?php esc_html_e('Child', 'nursery-waiting-list'); ?></th>
-                            <th><?php esc_html_e('Parent', 'nursery-waiting-list'); ?></th>
-                            <th><?php esc_html_e('Room', 'nursery-waiting-list'); ?></th>
+                            <th><?php esc_html_e('Parent/Carer', 'nursery-waiting-list'); ?></th>
                             <th><?php esc_html_e('Status', 'nursery-waiting-list'); ?></th>
                             <th><?php esc_html_e('Priority', 'nursery-waiting-list'); ?></th>
                             <th><?php esc_html_e('Date Added', 'nursery-waiting-list'); ?></th>
@@ -185,7 +184,7 @@ class NWL_Admin_Entries {
                     <tbody>
                         <?php if (empty($entries)) : ?>
                             <tr>
-                                <td colspan="9" class="nwl-no-entries">
+                                <td colspan="8" class="nwl-no-entries">
                                     <?php esc_html_e('No entries found.', 'nursery-waiting-list'); ?>
                                 </td>
                             </tr>
@@ -221,7 +220,6 @@ class NWL_Admin_Entries {
                                             <br><small><?php echo esc_html($entry->parent_phone); ?></small>
                                         <?php endif; ?>
                                     </td>
-                                    <td><?php echo esc_html($entry_handler->get_room_label($entry->room_requested)); ?></td>
                                     <td>
                                         <?php echo NWL_Admin::get_status_badge($entry->status); ?>
                                     </td>
@@ -336,9 +334,9 @@ class NWL_Admin_Entries {
                             </div>
                         </div>
 
-                        <!-- Parent Information -->
+                        <!-- Parent/Carer Information -->
                         <div class="nwl-form-section">
-                            <h2><?php esc_html_e('Parent/Guardian Information', 'nursery-waiting-list'); ?></h2>
+                            <h2><?php esc_html_e('Parent/Carer Information', 'nursery-waiting-list'); ?></h2>
                             
                             <div class="nwl-form-row">
                                 <div class="nwl-form-field">
@@ -401,14 +399,14 @@ class NWL_Admin_Entries {
                         <!-- Waiting List Details -->
                         <div class="nwl-form-section">
                             <h2><?php esc_html_e('Waiting List Details', 'nursery-waiting-list'); ?></h2>
-                            
+
                             <div class="nwl-form-row">
                                 <div class="nwl-form-field">
-                                    <label for="room_requested"><?php esc_html_e('Room Requested', 'nursery-waiting-list'); ?></label>
-                                    <select id="room_requested" name="room_requested">
+                                    <label for="age_group"><?php esc_html_e('Age Group', 'nursery-waiting-list'); ?></label>
+                                    <select id="age_group" name="age_group">
                                         <option value=""><?php esc_html_e('— Select —', 'nursery-waiting-list'); ?></option>
-                                        <?php foreach (NWL_Database::get_rooms() as $key => $label) : ?>
-                                            <option value="<?php echo esc_attr($key); ?>" <?php selected($is_edit ? $entry->room_requested : '', $key); ?>>
+                                        <?php foreach (NWL_Database::get_age_groups() as $key => $label) : ?>
+                                            <option value="<?php echo esc_attr($key); ?>" <?php selected($is_edit ? $entry->age_group : '', $key); ?>>
                                                 <?php echo esc_html($label); ?>
                                             </option>
                                         <?php endforeach; ?>
@@ -416,7 +414,7 @@ class NWL_Admin_Entries {
                                 </div>
                                 <div class="nwl-form-field">
                                     <label for="preferred_start_date"><?php esc_html_e('Preferred Start Date', 'nursery-waiting-list'); ?></label>
-                                    <input type="date" id="preferred_start_date" name="preferred_start_date" 
+                                    <input type="date" id="preferred_start_date" name="preferred_start_date"
                                            value="<?php echo $is_edit ? esc_attr($entry->preferred_start_date) : ''; ?>">
                                 </div>
                             </div>
@@ -424,37 +422,14 @@ class NWL_Admin_Entries {
                             <div class="nwl-form-row">
                                 <div class="nwl-form-field">
                                     <label for="days_required"><?php esc_html_e('Days Required', 'nursery-waiting-list'); ?></label>
-                                    <input type="text" id="days_required" name="days_required" 
+                                    <input type="text" id="days_required" name="days_required"
                                            value="<?php echo $is_edit ? esc_attr($entry->days_required) : ''; ?>"
                                            placeholder="<?php esc_attr_e('e.g. Monday, Wednesday, Friday', 'nursery-waiting-list'); ?>">
                                 </div>
                                 <div class="nwl-form-field">
                                     <label for="hours_per_week"><?php esc_html_e('Hours Per Week', 'nursery-waiting-list'); ?></label>
-                                    <input type="number" id="hours_per_week" name="hours_per_week" 
+                                    <input type="number" id="hours_per_week" name="hours_per_week"
                                            value="<?php echo $is_edit ? esc_attr($entry->hours_per_week) : ''; ?>">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Additional Information -->
-                        <div class="nwl-form-section">
-                            <h2><?php esc_html_e('Additional Information', 'nursery-waiting-list'); ?></h2>
-                            
-                            <div class="nwl-form-row">
-                                <div class="nwl-form-field nwl-full-width">
-                                    <label for="additional_needs"><?php esc_html_e('Additional Needs', 'nursery-waiting-list'); ?></label>
-                                    <textarea id="additional_needs" name="additional_needs" rows="3"><?php echo $is_edit ? esc_textarea($entry->additional_needs) : ''; ?></textarea>
-                                </div>
-                            </div>
-
-                            <div class="nwl-form-row">
-                                <div class="nwl-form-field">
-                                    <label for="allergies"><?php esc_html_e('Allergies', 'nursery-waiting-list'); ?></label>
-                                    <textarea id="allergies" name="allergies" rows="2"><?php echo $is_edit ? esc_textarea($entry->allergies) : ''; ?></textarea>
-                                </div>
-                                <div class="nwl-form-field">
-                                    <label for="medical_conditions"><?php esc_html_e('Medical Conditions', 'nursery-waiting-list'); ?></label>
-                                    <textarea id="medical_conditions" name="medical_conditions" rows="2"><?php echo $is_edit ? esc_textarea($entry->medical_conditions) : ''; ?></textarea>
                                 </div>
                             </div>
                         </div>
@@ -473,9 +448,9 @@ class NWL_Admin_Entries {
 
                             <div class="nwl-form-row">
                                 <div class="nwl-form-field nwl-full-width">
-                                    <label for="public_notes"><?php esc_html_e('Public Notes (Visible to Parents)', 'nursery-waiting-list'); ?></label>
+                                    <label for="public_notes"><?php esc_html_e('Public Notes (Visible to Parents/Carers)', 'nursery-waiting-list'); ?></label>
                                     <textarea id="public_notes" name="public_notes" rows="3"><?php echo $is_edit ? esc_textarea($entry->public_notes) : ''; ?></textarea>
-                                    <p class="description"><?php esc_html_e('These notes can be included in emails and are visible when parents check their status.', 'nursery-waiting-list'); ?></p>
+                                    <p class="description"><?php esc_html_e('These notes can be included in emails and are visible when parents/carers check their status.', 'nursery-waiting-list'); ?></p>
                                 </div>
                             </div>
                         </div>
@@ -725,6 +700,26 @@ class NWL_Admin_Entries {
     }
 
     /**
+     * AJAX: Cancel deletion request
+     */
+    public function ajax_cancel_deletion() {
+        check_ajax_referer('nwl_admin', 'nonce');
+
+        if (!current_user_can('nwl_delete_entries')) {
+            wp_send_json_error(array('message' => __('Permission denied.', 'nursery-waiting-list')));
+        }
+
+        $entry_id = absint($_POST['entry_id']);
+        $result = NWL_Entry::get_instance()->cancel_deletion($entry_id);
+
+        if (is_wp_error($result)) {
+            wp_send_json_error(array('message' => $result->get_error_message()));
+        }
+
+        wp_send_json_success(array('message' => __('Deletion request cancelled.', 'nursery-waiting-list')));
+    }
+
+    /**
      * AJAX: Bulk action
      */
     public function ajax_bulk_action() {
@@ -805,13 +800,10 @@ class NWL_Admin_Entries {
             'parent_address_line2' => sanitize_text_field($_POST['parent_address_line2']),
             'parent_city' => sanitize_text_field($_POST['parent_city']),
             'parent_postcode' => sanitize_text_field($_POST['parent_postcode']),
-            'room_requested' => sanitize_text_field($_POST['room_requested']),
+            'age_group' => sanitize_text_field($_POST['age_group']),
             'preferred_start_date' => sanitize_text_field($_POST['preferred_start_date']),
             'days_required' => sanitize_text_field($_POST['days_required']),
             'hours_per_week' => absint($_POST['hours_per_week']),
-            'additional_needs' => sanitize_textarea_field($_POST['additional_needs']),
-            'allergies' => sanitize_textarea_field($_POST['allergies']),
-            'medical_conditions' => sanitize_textarea_field($_POST['medical_conditions']),
             'internal_notes' => sanitize_textarea_field($_POST['internal_notes']),
             'public_notes' => sanitize_textarea_field($_POST['public_notes']),
         );
