@@ -39,10 +39,6 @@ class NWL_Admin_Settings {
         register_setting('nwl_email_settings', 'nwl_email_reply_to');
         register_setting('nwl_email_settings', 'nwl_send_registration_email');
         register_setting('nwl_email_settings', 'nwl_send_status_emails');
-
-        // GDPR Settings
-        register_setting('nwl_gdpr_settings', 'nwl_data_retention_days');
-        register_setting('nwl_gdpr_settings', 'nwl_auto_delete_removed');
     }
 
     /**
@@ -68,10 +64,6 @@ class NWL_Admin_Settings {
                    class="nav-tab <?php echo $active_tab === 'email' ? 'nav-tab-active' : ''; ?>">
                     <?php esc_html_e('Email', 'nursery-waiting-list'); ?>
                 </a>
-                <a href="<?php echo esc_url(add_query_arg('tab', 'gdpr')); ?>"
-                   class="nav-tab <?php echo $active_tab === 'gdpr' ? 'nav-tab-active' : ''; ?>">
-                    <?php esc_html_e('GDPR & Privacy', 'nursery-waiting-list'); ?>
-                </a>
                 <a href="<?php echo esc_url(add_query_arg('tab', 'gravity-forms')); ?>"
                    class="nav-tab <?php echo $active_tab === 'gravity-forms' ? 'nav-tab-active' : ''; ?>">
                     <?php esc_html_e('Gravity Forms', 'nursery-waiting-list'); ?>
@@ -83,9 +75,6 @@ class NWL_Admin_Settings {
                 switch ($active_tab) {
                     case 'email':
                         self::render_email_settings();
-                        break;
-                    case 'gdpr':
-                        self::render_gdpr_settings();
                         break;
                     case 'gravity-forms':
                         self::render_gravity_forms_settings();
@@ -275,94 +264,6 @@ class NWL_Admin_Settings {
                 }
             }
         }
-    }
-
-    /**
-     * Render GDPR settings
-     */
-    private static function render_gdpr_settings() {
-        if (isset($_POST['nwl_save_gdpr']) && wp_verify_nonce($_POST['nwl_gdpr_nonce'], 'nwl_save_gdpr')) {
-            update_option('nwl_data_retention_days', absint($_POST['nwl_data_retention_days']));
-            update_option('nwl_auto_delete_removed', isset($_POST['nwl_auto_delete_removed']) ? 1 : 0);
-            
-            echo '<div class="notice notice-success"><p>' . esc_html__('Settings saved.', 'nursery-waiting-list') . '</p></div>';
-        }
-
-        $gdpr_report = NWL_GDPR::get_instance()->get_retention_report();
-        ?>
-        <div class="nwl-gdpr-overview">
-            <h3><?php esc_html_e('Data Overview', 'nursery-waiting-list'); ?></h3>
-            <div class="nwl-gdpr-stats">
-                <div class="nwl-gdpr-stat">
-                    <span class="nwl-stat-number"><?php echo number_format_i18n($gdpr_report['total_entries']); ?></span>
-                    <span class="nwl-stat-label"><?php esc_html_e('Total Entries', 'nursery-waiting-list'); ?></span>
-                </div>
-                <div class="nwl-gdpr-stat">
-                    <span class="nwl-stat-number"><?php echo number_format_i18n($gdpr_report['deletion_requested']); ?></span>
-                    <span class="nwl-stat-label"><?php esc_html_e('Pending Deletion', 'nursery-waiting-list'); ?></span>
-                </div>
-                <div class="nwl-gdpr-stat">
-                    <span class="nwl-stat-number"><?php echo number_format_i18n($gdpr_report['past_retention']); ?></span>
-                    <span class="nwl-stat-label"><?php esc_html_e('Past Retention Period', 'nursery-waiting-list'); ?></span>
-                </div>
-            </div>
-        </div>
-
-        <form method="post">
-            <?php wp_nonce_field('nwl_save_gdpr', 'nwl_gdpr_nonce'); ?>
-            
-            <table class="form-table">
-                <tr>
-                    <th scope="row">
-                        <label for="nwl_data_retention_days"><?php esc_html_e('Data Retention Period', 'nursery-waiting-list'); ?></label>
-                    </th>
-                    <td>
-                        <input type="number" id="nwl_data_retention_days" name="nwl_data_retention_days" 
-                               value="<?php echo esc_attr(get_option('nwl_data_retention_days', 365)); ?>" 
-                               class="small-text" min="0">
-                        <?php esc_html_e('days', 'nursery-waiting-list'); ?>
-                        <p class="description">
-                            <?php esc_html_e('How long to keep data for removed/declined entries before deletion. Set to 0 to disable automatic deletion.', 'nursery-waiting-list'); ?>
-                        </p>
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row"><?php esc_html_e('Automatic Deletion', 'nursery-waiting-list'); ?></th>
-                    <td>
-                        <label>
-                            <input type="checkbox" name="nwl_auto_delete_removed" value="1" 
-                                   <?php checked(get_option('nwl_auto_delete_removed', 0)); ?>>
-                            <?php esc_html_e('Automatically delete entries past the retention period', 'nursery-waiting-list'); ?>
-                        </label>
-                        <p class="description">
-                            <?php esc_html_e('When enabled, entries marked as removed or declined will be permanently deleted after the retention period.', 'nursery-waiting-list'); ?>
-                        </p>
-                    </td>
-                </tr>
-            </table>
-
-            <p class="submit">
-                <input type="submit" name="nwl_save_gdpr" class="button button-primary" value="<?php esc_attr_e('Save Settings', 'nursery-waiting-list'); ?>">
-            </p>
-        </form>
-
-        <hr>
-
-        <h3><?php esc_html_e('GDPR Compliance Features', 'nursery-waiting-list'); ?></h3>
-        <ul>
-            <li>✓ <?php esc_html_e('Integrated with WordPress Personal Data Exporter', 'nursery-waiting-list'); ?></li>
-            <li>✓ <?php esc_html_e('Integrated with WordPress Personal Data Eraser', 'nursery-waiting-list'); ?></li>
-            <li>✓ <?php esc_html_e('Privacy policy content suggestion added', 'nursery-waiting-list'); ?></li>
-            <li>✓ <?php esc_html_e('Consent tracking for entries', 'nursery-waiting-list'); ?></li>
-            <li>✓ <?php esc_html_e('Data deletion request workflow', 'nursery-waiting-list'); ?></li>
-        </ul>
-
-        <p>
-            <a href="<?php echo esc_url(admin_url('options-privacy.php')); ?>" class="button">
-                <?php esc_html_e('Manage Privacy Tools', 'nursery-waiting-list'); ?>
-            </a>
-        </p>
-        <?php
     }
 
     /**

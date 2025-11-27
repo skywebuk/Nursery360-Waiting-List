@@ -90,24 +90,24 @@ class NWL_Admin_Reports {
                 </div>
             </div>
 
-            <!-- By Room -->
+            <!-- By Age Group -->
             <div class="nwl-report-section">
-                <h2><?php esc_html_e('Entries by Room', 'nursery-waiting-list'); ?></h2>
-                
+                <h2><?php esc_html_e('Entries by Age Group', 'nursery-waiting-list'); ?></h2>
+
                 <div class="nwl-report-row">
                     <div class="nwl-report-chart">
-                        <canvas id="nwl-room-chart" height="200"></canvas>
+                        <canvas id="nwl-age-chart" height="200"></canvas>
                     </div>
                     <div class="nwl-report-table">
                         <table class="widefat">
                             <thead>
                                 <tr>
-                                    <th><?php esc_html_e('Room', 'nursery-waiting-list'); ?></th>
+                                    <th><?php esc_html_e('Age Group', 'nursery-waiting-list'); ?></th>
                                     <th><?php esc_html_e('Count', 'nursery-waiting-list'); ?></th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach ($summary['by_room'] as $room => $data) : ?>
+                                <?php foreach ($summary['by_age_group'] as $age => $data) : ?>
                                     <?php if ($data['count'] > 0) : ?>
                                         <tr>
                                             <td><?php echo esc_html($data['label']); ?></td>
@@ -304,20 +304,20 @@ class NWL_Admin_Reports {
                 });
             }
 
-            // Room Chart
-            var roomCtx = document.getElementById('nwl-room-chart');
-            if (roomCtx) {
-                new Chart(roomCtx, {
+            // Age Group Chart
+            var ageCtx = document.getElementById('nwl-age-chart');
+            if (ageCtx) {
+                new Chart(ageCtx, {
                     type: 'bar',
                     data: {
                         labels: [
-                            <?php 
+                            <?php
                             $labels = array();
                             $data = array();
-                            foreach ($summary['by_room'] as $room => $roomData) {
-                                if ($roomData['count'] > 0) {
-                                    $labels[] = "'" . esc_js($roomData['label']) . "'";
-                                    $data[] = $roomData['count'];
+                            foreach ($summary['by_age_group'] as $age => $ageData) {
+                                if ($ageData['count'] > 0) {
+                                    $labels[] = "'" . esc_js($ageData['label']) . "'";
+                                    $data[] = $ageData['count'];
                                 }
                             }
                             echo implode(', ', $labels);

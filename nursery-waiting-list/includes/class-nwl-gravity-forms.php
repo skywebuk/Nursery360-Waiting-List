@@ -78,7 +78,6 @@ class NWL_Gravity_Forms {
         
         $data = array(
             'status' => isset($settings['default_status']) ? $settings['default_status'] : 'pending',
-            'room_requested' => isset($settings['default_room']) ? $settings['default_room'] : '',
         );
 
         // Map each configured field
@@ -197,18 +196,6 @@ class NWL_Gravity_Forms {
                     </select>
                 </div>
 
-                <div class="gform-settings-field">
-                    <label class="gform-settings-label"><?php esc_html_e('Default Room', 'nursery-waiting-list'); ?></label>
-                    <select name="default_room">
-                        <option value=""><?php esc_html_e('— Select —', 'nursery-waiting-list'); ?></option>
-                        <?php foreach (NWL_Database::get_rooms() as $key => $label) : ?>
-                            <option value="<?php echo esc_attr($key); ?>" <?php selected($settings['default_room'] ?? '', $key); ?>>
-                                <?php echo esc_html($label); ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-
                 <h4><?php esc_html_e('Field Mapping', 'nursery-waiting-list'); ?></h4>
                 <p class="description"><?php esc_html_e('Map your form fields to waiting list entry fields.', 'nursery-waiting-list'); ?></p>
 
@@ -273,26 +260,12 @@ class NWL_Gravity_Forms {
                 'parent_mobile' => __('Parent Mobile', 'nursery-waiting-list'),
                 'parent_address' => __('Parent Address (Address field)', 'nursery-waiting-list'),
             ),
-            __('Second Parent/Guardian', 'nursery-waiting-list') => array(
-                'parent2_name' => __('Second Parent Name', 'nursery-waiting-list'),
-                'parent2_email' => __('Second Parent Email', 'nursery-waiting-list'),
-                'parent2_phone' => __('Second Parent Phone', 'nursery-waiting-list'),
-            ),
             __('Waiting List Details', 'nursery-waiting-list') => array(
-                'room_requested' => __('Room Requested', 'nursery-waiting-list'),
                 'age_group' => __('Age Group', 'nursery-waiting-list'),
                 'preferred_start_date' => __('Preferred Start Date', 'nursery-waiting-list'),
                 'days_required' => __('Days Required', 'nursery-waiting-list'),
                 'sessions_required' => __('Sessions Required', 'nursery-waiting-list'),
                 'hours_per_week' => __('Hours Per Week', 'nursery-waiting-list'),
-            ),
-            __('Additional Information', 'nursery-waiting-list') => array(
-                'funding_type' => __('Funding Type', 'nursery-waiting-list'),
-                'eligible_for_30_hours' => __('Eligible for 30 Hours', 'nursery-waiting-list'),
-                'additional_needs' => __('Additional Needs', 'nursery-waiting-list'),
-                'allergies' => __('Allergies', 'nursery-waiting-list'),
-                'medical_conditions' => __('Medical Conditions', 'nursery-waiting-list'),
-                'how_heard' => __('How Did You Hear About Us', 'nursery-waiting-list'),
             ),
         );
     }
@@ -327,7 +300,6 @@ class NWL_Gravity_Forms {
         return wp_parse_args($settings, array(
             'enabled' => false,
             'default_status' => 'pending',
-            'default_room' => '',
             'field_map' => array(),
         ));
     }
@@ -339,7 +311,6 @@ class NWL_Gravity_Forms {
         $settings = array(
             'enabled' => !empty($data['enabled']),
             'default_status' => sanitize_text_field($data['default_status'] ?? 'pending'),
-            'default_room' => sanitize_text_field($data['default_room'] ?? ''),
             'field_map' => array(),
         );
 

@@ -66,7 +66,6 @@ final class Nursery_Waiting_List {
         require_once NWL_PLUGIN_DIR . 'includes/class-nwl-entry.php';
         require_once NWL_PLUGIN_DIR . 'includes/class-nwl-email.php';
         require_once NWL_PLUGIN_DIR . 'includes/class-nwl-gravity-forms.php';
-        require_once NWL_PLUGIN_DIR . 'includes/class-nwl-gdpr.php';
         require_once NWL_PLUGIN_DIR . 'includes/class-nwl-export.php';
         require_once NWL_PLUGIN_DIR . 'includes/class-nwl-stats.php';
         
@@ -111,7 +110,6 @@ final class Nursery_Waiting_List {
         NWL_Entry::get_instance();
         NWL_Email::get_instance();
         NWL_Gravity_Forms::get_instance();
-        NWL_GDPR::get_instance();
         NWL_Export::get_instance();
         NWL_Stats::get_instance();
         NWL_Public::get_instance();

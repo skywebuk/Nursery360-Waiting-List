@@ -246,6 +246,114 @@ class NWL_Admin_Templates {
                 <iframe class="nwl-preview-frame" frameborder="0"></iframe>
             </div>
         </div>
+
+        <script>
+        jQuery(document).ready(function($) {
+            // Template form submission
+            $('#nwl-template-form').on('submit', function(e) {
+                e.preventDefault();
+
+                var $form = $(this);
+                var $btn = $form.find('[type="submit"]');
+                var originalText = $btn.text();
+
+                $btn.prop('disabled', true).text('<?php esc_html_e('Saving...', 'nursery-waiting-list'); ?>');
+
+                // Get editor content if using TinyMCE
+                if (typeof tinyMCE !== 'undefined' && tinyMCE.get('body')) {
+                    tinyMCE.get('body').save();
+                }
+
+                $.post(nwlAdmin.ajaxUrl, $form.serialize() + '&action=nwl_save_template', function(response) {
+                    if (response.success) {
+                        if (response.data.redirect) {
+                            window.location.href = response.data.redirect;
+                        }
+                    } else {
+                        alert(response.data.message || '<?php esc_html_e('Error saving template.', 'nursery-waiting-list'); ?>');
+                        $btn.prop('disabled', false).text(originalText);
+                    }
+                }).fail(function() {
+                    alert('<?php esc_html_e('Error saving template.', 'nursery-waiting-list'); ?>');
+                    $btn.prop('disabled', false).text(originalText);
+                });
+            });
+
+            // Preview template
+            $('.nwl-preview-template').on('click', function() {
+                var subject = $('#subject').val();
+                var body = '';
+
+                // Get editor content
+                if (typeof tinyMCE !== 'undefined' && tinyMCE.get('body')) {
+                    body = tinyMCE.get('body').getContent();
+                } else {
+                    body = $('#body').val();
+                }
+
+                $.post(nwlAdmin.ajaxUrl, {
+                    action: 'nwl_preview_template',
+                    nonce: nwlAdmin.nonce,
+                    subject: subject,
+                    body: body
+                }, function(response) {
+                    if (response.success) {
+                        $('.nwl-preview-subject').text('<?php esc_html_e('Subject:', 'nursery-waiting-list'); ?> ' + response.data.subject);
+
+                        var iframe = $('.nwl-preview-frame')[0];
+                        var iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                        iframeDoc.open();
+                        iframeDoc.write(response.data.body);
+                        iframeDoc.close();
+
+                        $('#nwl-preview-modal').fadeIn();
+                    } else {
+                        alert(response.data.message || '<?php esc_html_e('Error loading preview.', 'nursery-waiting-list'); ?>');
+                    }
+                });
+            });
+
+            // Delete template
+            $('.nwl-delete-template').on('click', function() {
+                if (!confirm('<?php esc_html_e('Are you sure you want to delete this template?', 'nursery-waiting-list'); ?>')) {
+                    return;
+                }
+
+                var templateId = $(this).data('id');
+
+                $.post(nwlAdmin.ajaxUrl, {
+                    action: 'nwl_delete_template',
+                    nonce: nwlAdmin.nonce,
+                    template_id: templateId
+                }, function(response) {
+                    if (response.success && response.data.redirect) {
+                        window.location.href = response.data.redirect;
+                    } else {
+                        alert(response.data.message || '<?php esc_html_e('Error deleting template.', 'nursery-waiting-list'); ?>');
+                    }
+                });
+            });
+
+            // Close modal
+            $('.nwl-modal-close, .nwl-modal').on('click', function(e) {
+                if (e.target === this) {
+                    $('.nwl-modal').fadeOut();
+                }
+            });
+
+            // Copy variable on click
+            $('.nwl-copy-var').on('click', function() {
+                var text = $(this).text();
+                navigator.clipboard.writeText(text);
+
+                var $this = $(this);
+                $this.addClass('copied');
+                setTimeout(function() {
+                    $this.removeClass('copied');
+                }, 1000);
+            });
+        });
+        </script>
         <?php
     }
 
@@ -338,7 +446,6 @@ class NWL_Admin_Templates {
             'parent_last_name' => 'Johnson',
             'parent_email' => 'sarah.johnson@example.com',
             'parent_phone' => '01onal234 567890',
-            'room_requested' => 'toddler',
             'age_group' => '12-24m',
             'preferred_start_date' => date('Y-m-d', strtotime('+2 months')),
             'status' => 'offered',

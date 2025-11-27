@@ -105,15 +105,6 @@ class NWL_Admin_Messaging {
                                             </select>
                                         </div>
                                         <div class="nwl-form-field">
-                                            <label for="filter_room"><?php esc_html_e('Room', 'nursery-waiting-list'); ?></label>
-                                            <select id="filter_room" name="filter_room">
-                                                <option value=""><?php esc_html_e('All Rooms', 'nursery-waiting-list'); ?></option>
-                                                <?php foreach (NWL_Database::get_rooms() as $key => $label) : ?>
-                                                    <option value="<?php echo esc_attr($key); ?>"><?php echo esc_html($label); ?></option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                        </div>
-                                        <div class="nwl-form-field">
                                             <label for="filter_priority"><?php esc_html_e('Priority', 'nursery-waiting-list'); ?></label>
                                             <select id="filter_priority" name="filter_priority">
                                                 <option value=""><?php esc_html_e('All Priorities', 'nursery-waiting-list'); ?></option>
@@ -210,7 +201,6 @@ class NWL_Admin_Messaging {
                             <li><code class="nwl-copy-var">{{parent_name}}</code></li>
                             <li><code class="nwl-copy-var">{{waiting_list_number}}</code></li>
                             <li><code class="nwl-copy-var">{{date_added}}</code></li>
-                            <li><code class="nwl-copy-var">{{room_requested}}</code></li>
                             <li><code class="nwl-copy-var">{{status}}</code></li>
                             <li><code class="nwl-copy-var">{{nursery_name}}</code></li>
                             <li><code class="nwl-copy-var">{{stats_page_url}}</code></li>
@@ -264,7 +254,7 @@ class NWL_Admin_Messaging {
             });
 
             // Filter changes
-            $('#filter_status, #filter_room, #filter_priority').on('change', function() {
+            $('#filter_status, #filter_priority').on('change', function() {
                 updateRecipientCount();
             });
 
@@ -281,7 +271,6 @@ class NWL_Admin_Messaging {
                     action: 'nwl_get_filtered_count',
                     nonce: nwlAdmin.nonce,
                     status: $('#filter_status').val(),
-                    room: $('#filter_room').val(),
                     priority: $('#filter_priority').val()
                 }, function(response) {
                     if (response.success) {
@@ -348,7 +337,6 @@ class NWL_Admin_Messaging {
             
             if ($send_mode === 'filtered') {
                 $args['status'] = isset($_POST['filter_status']) ? sanitize_text_field($_POST['filter_status']) : '';
-                $args['room'] = isset($_POST['filter_room']) ? sanitize_text_field($_POST['filter_room']) : '';
                 $args['priority'] = isset($_POST['filter_priority']) ? sanitize_text_field($_POST['filter_priority']) : '';
             }
             
@@ -446,7 +434,6 @@ class NWL_Admin_Messaging {
 
         $args = array(
             'status' => isset($_POST['status']) ? sanitize_text_field($_POST['status']) : '',
-            'room' => isset($_POST['room']) ? sanitize_text_field($_POST['room']) : '',
             'priority' => isset($_POST['priority']) ? sanitize_text_field($_POST['priority']) : '',
             'per_page' => 1,
             'page' => 1,
