@@ -563,18 +563,287 @@
     .nwl-form-row {
         flex-direction: column;
     }
-    
+
     .nwl-filters {
         flex-direction: column;
         align-items: stretch;
     }
-    
+
     .nwl-filter-group select,
     .nwl-filter-group input {
         min-width: 100%;
     }
-    
+
     .nwl-quick-stats {
         flex-direction: column;
+    }
+}
+
+/* ==========================================================================
+   Accessibility Improvements
+   ========================================================================== */
+
+/* Focus states for better keyboard navigation */
+.nwl-admin-wrap a:focus,
+.nwl-admin-wrap button:focus,
+.nwl-admin-wrap input:focus,
+.nwl-admin-wrap select:focus,
+.nwl-admin-wrap textarea:focus {
+    outline: 2px solid #4A90A4;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px rgba(74, 144, 164, 0.2);
+}
+
+/* Skip link for keyboard users */
+.nwl-skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: #4A90A4;
+    color: #fff;
+    padding: 8px 16px;
+    z-index: 100001;
+    text-decoration: none;
+    border-radius: 0 0 4px 0;
+}
+
+.nwl-skip-link:focus {
+    top: 0;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .nwl-badge {
+        border: 2px solid currentColor;
+    }
+
+    .nwl-stat-box {
+        border: 2px solid #333;
+    }
+
+    .nwl-form-section {
+        border: 2px solid #333;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .nwl-stat-box,
+    .nwl-badge,
+    .nwl-progress,
+    * {
+        transition: none !important;
+        animation: none !important;
+    }
+}
+
+/* Screen reader only content */
+.nwl-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Better button contrast */
+.nwl-admin-wrap .button:focus,
+.nwl-admin-wrap .button-primary:focus {
+    outline: 2px solid #4A90A4;
+    outline-offset: 2px;
+}
+
+/* Form label visibility */
+.nwl-form-field label {
+    font-weight: 600;
+}
+
+/* Required field indicator - more accessible */
+.nwl-form-field label .required {
+    color: #dc3545;
+}
+
+.nwl-form-field label .required::after {
+    content: ' (required)';
+    position: absolute;
+    left: -9999px;
+}
+
+/* Table headers - ensure proper scope */
+.nwl-entries-table th {
+    font-weight: 600;
+}
+
+/* ==========================================================================
+   Print Styles for Reports
+   ========================================================================== */
+
+@media print {
+    /* Hide non-essential elements */
+    .nwl-admin-wrap .nav-tab-wrapper,
+    .nwl-admin-wrap .nwl-filters-form,
+    .nwl-admin-wrap .nwl-bulk-actions,
+    .nwl-admin-wrap .nwl-filter-buttons,
+    .nwl-admin-wrap .button,
+    .nwl-admin-wrap .nwl-form-actions,
+    .nwl-admin-wrap .nwl-quick-actions,
+    .nwl-admin-wrap .check-column,
+    #adminmenumain,
+    #wpadminbar,
+    #wpfooter {
+        display: none !important;
+    }
+
+    /* Reset body and wpcontent for full width */
+    body.wp-admin {
+        margin: 0;
+        padding: 0;
+        background: #fff;
+    }
+
+    #wpcontent,
+    #wpbody,
+    #wpbody-content {
+        margin: 0 !important;
+        padding: 15px !important;
+    }
+
+    .nwl-admin-wrap {
+        max-width: 100% !important;
+    }
+
+    /* Page title */
+    .nwl-admin-wrap h1 {
+        font-size: 24px;
+        margin-bottom: 20px;
+        page-break-after: avoid;
+    }
+
+    /* Stats cards for print */
+    .nwl-quick-stats {
+        page-break-inside: avoid;
+        background: #fff;
+        border: 1px solid #ccc;
+    }
+
+    .nwl-stat-box {
+        background: #f9f9f9;
+        border: 1px solid #ddd;
+    }
+
+    .nwl-stat-box:hover,
+    .nwl-stat-box.active {
+        background: #f9f9f9;
+        color: inherit;
+        border-color: #ddd;
+    }
+
+    /* Tables */
+    .nwl-entries-table {
+        width: 100%;
+        border-collapse: collapse;
+        page-break-inside: auto;
+    }
+
+    .nwl-entries-table tr {
+        page-break-inside: avoid;
+        page-break-after: auto;
+    }
+
+    .nwl-entries-table th,
+    .nwl-entries-table td {
+        border: 1px solid #ccc;
+        padding: 8px;
+    }
+
+    /* Badges for print */
+    .nwl-badge {
+        background: transparent !important;
+        border: 1px solid #333;
+        color: #333 !important;
+    }
+
+    /* Reports Grid */
+    .nwl-reports-grid {
+        display: block;
+    }
+
+    .nwl-report-section {
+        page-break-inside: avoid;
+        margin-bottom: 20px;
+        border: 1px solid #ccc;
+    }
+
+    .nwl-stats-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .nwl-stat-card {
+        flex: 1 1 45%;
+        border: 1px solid #ccc;
+        page-break-inside: avoid;
+    }
+
+    .nwl-stat-icon {
+        background: #f0f0f0 !important;
+        color: #333 !important;
+    }
+
+    /* Edit container for print */
+    .nwl-edit-container {
+        display: block;
+    }
+
+    .nwl-edit-sidebar {
+        width: 100%;
+        margin-top: 20px;
+    }
+
+    .nwl-sidebar-box {
+        page-break-inside: avoid;
+        border: 1px solid #ccc;
+    }
+
+    /* Notes for print */
+    .nwl-notes-list {
+        max-height: none;
+        overflow: visible;
+    }
+
+    .nwl-note {
+        page-break-inside: avoid;
+        border: 1px solid #ccc;
+        background: #f9f9f9 !important;
+    }
+
+    /* Attention boxes */
+    .nwl-attention-box {
+        background: #f9f9f9 !important;
+        border: 1px solid #333;
+    }
+
+    /* Charts - hide as they don't print well */
+    .nwl-chart-container {
+        display: none;
+    }
+
+    /* Print header with date */
+    .nwl-admin-wrap::before {
+        content: 'Nursery360 Waiting List Report - Printed: ' attr(data-print-date);
+        display: block;
+        font-size: 12px;
+        color: #666;
+        margin-bottom: 10px;
+    }
+
+    /* URLs visible in print */
+    a[href]::after {
+        content: none; /* Don't show URLs as they're not useful in print */
     }
 }

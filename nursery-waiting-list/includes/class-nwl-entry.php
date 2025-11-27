@@ -143,12 +143,11 @@ class NWL_Entry {
      */
     public function get_by_email($email) {
         global $wpdb;
-        
+
         $table = $wpdb->prefix . NWL_TABLE_ENTRIES;
-        
+
         return $wpdb->get_results($wpdb->prepare(
-            "SELECT * FROM $table WHERE parent_email = %s OR parent2_email = %s ORDER BY created_at DESC",
-            $email,
+            "SELECT * FROM $table WHERE parent_email = %s ORDER BY created_at DESC",
             $email
         ));
     }
@@ -158,21 +157,20 @@ class NWL_Entry {
      */
     public function get_by_phone($phone) {
         global $wpdb;
-        
+
         $table = $wpdb->prefix . NWL_TABLE_ENTRIES;
-        
-        // Normalize phone number for search
+
+        // Normalize phone number for search and escape for LIKE
         $phone_clean = preg_replace('/[^0-9]/', '', $phone);
-        
+        $phone_escaped = '%' . $wpdb->esc_like($phone_clean) . '%';
+
         return $wpdb->get_results($wpdb->prepare(
-            "SELECT * FROM $table 
+            "SELECT * FROM $table
             WHERE REPLACE(REPLACE(REPLACE(parent_phone, ' ', ''), '-', ''), '+', '') LIKE %s
             OR REPLACE(REPLACE(REPLACE(parent_mobile, ' ', ''), '-', ''), '+', '') LIKE %s
-            OR REPLACE(REPLACE(REPLACE(parent2_phone, ' ', ''), '-', ''), '+', '') LIKE %s
             ORDER BY created_at DESC",
-            '%' . $phone_clean . '%',
-            '%' . $phone_clean . '%',
-            '%' . $phone_clean . '%'
+            $phone_escaped,
+            $phone_escaped
         ));
     }
 
@@ -181,10 +179,9 @@ class NWL_Entry {
      */
     public function get_entries($args = array()) {
         global $wpdb;
-        
+
         $defaults = array(
             'status' => '',
-            'room' => '',
             'age_group' => '',
             'priority' => '',
             'date_from' => '',
@@ -196,14 +193,14 @@ class NWL_Entry {
             'page' => 1,
             'deletion_requested' => '',
         );
-        
+
         $args = wp_parse_args($args, $defaults);
-        
+
         $table = $wpdb->prefix . NWL_TABLE_ENTRIES;
-        
+
         $where = array('1=1');
         $values = array();
-        
+
         if (!empty($args['status'])) {
             if (is_array($args['status'])) {
                 $placeholders = implode(',', array_fill(0, count($args['status']), '%s'));
@@ -214,76 +211,71 @@ class NWL_Entry {
                 $values[] = $args['status'];
             }
         }
-        
-        if (!empty($args['room'])) {
-            $where[] = 'room_requested = %s';
-            $values[] = $args['room'];
-        }
-        
+
         if (!empty($args['age_group'])) {
             $where[] = 'age_group = %s';
             $values[] = $args['age_group'];
         }
-        
+
         if (!empty($args['priority'])) {
             $where[] = 'priority = %s';
             $values[] = $args['priority'];
         }
-        
+
         if (!empty($args['date_from'])) {
             $where[] = 'DATE(created_at) >= %s';
             $values[] = $args['date_from'];
         }
-        
+
         if (!empty($args['date_to'])) {
             $where[] = 'DATE(created_at) <= %s';
             $values[] = $args['date_to'];
         }
-        
+
         if ($args['deletion_requested'] !== '') {
             $where[] = 'deletion_requested = %d';
             $values[] = (int) $args['deletion_requested'];
         }
-        
+
         if (!empty($args['search'])) {
             $search = '%' . $wpdb->esc_like($args['search']) . '%';
             $where[] = '(
-                child_first_name LIKE %s 
-                OR child_last_name LIKE %s 
-                OR parent_first_name LIKE %s 
-                OR parent_last_name LIKE %s 
-                OR parent_email LIKE %s 
-                OR parent_phone LIKE %s 
+                child_first_name LIKE %s
+                OR child_last_name LIKE %s
+                OR parent_first_name LIKE %s
+                OR parent_last_name LIKE %s
+                OR parent_email LIKE %s
+                OR parent_phone LIKE %s
                 OR parent_mobile LIKE %s
                 OR waiting_list_number LIKE %s
             )';
             $values = array_merge($values, array_fill(0, 8, $search));
         }
-        
+
         $where_clause = implode(' AND ', $where);
-        
+
         // Validate orderby
-        $allowed_orderby = array('created_at', 'updated_at', 'child_first_name', 'status', 'room_requested', 'priority');
+        $allowed_orderby = array('created_at', 'updated_at', 'child_first_name', 'status', 'priority');
         $orderby = in_array($args['orderby'], $allowed_orderby) ? $args['orderby'] : 'created_at';
         $order = strtoupper($args['order']) === 'ASC' ? 'ASC' : 'DESC';
-        
+
         // Calculate offset
         $offset = ($args['page'] - 1) * $args['per_page'];
-        
+
         // Get total count
         $count_sql = "SELECT COUNT(*) FROM $table WHERE $where_clause";
         if (!empty($values)) {
             $count_sql = $wpdb->prepare($count_sql, $values);
         }
         $total = $wpdb->get_var($count_sql);
-        
+
         // Get results
         $sql = "SELECT * FROM $table WHERE $where_clause ORDER BY $orderby $order LIMIT %d OFFSET %d";
         $values[] = $args['per_page'];
         $values[] = $offset;
-        
+
         $results = $wpdb->get_results($wpdb->prepare($sql, $values));
-        
+
         return array(
             'entries' => $results,
             'total' => (int) $total,
@@ -401,36 +393,36 @@ class NWL_Entry {
      * Sanitize entry data
      */
     private function sanitize_entry_data($data) {
+        $email_fields = array('parent_email');
+
         $text_fields = array(
             'child_first_name', 'child_last_name', 'child_gender',
-            'parent_first_name', 'parent_last_name', 'parent_email',
+            'parent_first_name', 'parent_last_name',
             'parent_phone', 'parent_mobile', 'parent_address_line1',
             'parent_address_line2', 'parent_city', 'parent_postcode',
-            'parent2_first_name', 'parent2_last_name', 'parent2_email', 'parent2_phone',
-            'room_requested', 'age_group', 'days_required', 'sessions_required',
-            'funding_type', 'how_heard', 'status', 'priority', 'offer_response',
+            'age_group', 'days_required', 'sessions_required',
+            'status', 'priority', 'offer_response',
             'waiting_list_number'
         );
-        
+
         $textarea_fields = array(
-            'additional_needs', 'allergies', 'medical_conditions',
             'internal_notes', 'public_notes'
         );
-        
+
         $int_fields = array('hours_per_week', 'created_by', 'updated_by');
-        
+
         foreach ($data as $key => $value) {
-            if (in_array($key, $text_fields)) {
+            if (in_array($key, $email_fields)) {
+                $data[$key] = sanitize_email($value);
+            } elseif (in_array($key, $text_fields)) {
                 $data[$key] = sanitize_text_field($value);
             } elseif (in_array($key, $textarea_fields)) {
                 $data[$key] = sanitize_textarea_field($value);
             } elseif (in_array($key, $int_fields)) {
                 $data[$key] = absint($value);
-            } elseif ($key === 'parent_email' || $key === 'parent2_email') {
-                $data[$key] = sanitize_email($value);
             }
         }
-        
+
         return $data;
     }
 
@@ -454,14 +446,6 @@ class NWL_Entry {
     public function get_status_label($status) {
         $statuses = NWL_Database::get_statuses();
         return isset($statuses[$status]) ? $statuses[$status] : ucfirst($status);
-    }
-
-    /**
-     * Get room label
-     */
-    public function get_room_label($room) {
-        $rooms = NWL_Database::get_rooms();
-        return isset($rooms[$room]) ? $rooms[$room] : $room;
     }
 
     /**

@@ -56,6 +56,12 @@ class NWL_Public {
                 'error' => __('An error occurred. Please try again.', 'nursery-waiting-list'),
                 'notFound' => __('No entries found with the provided information.', 'nursery-waiting-list'),
                 'invalidInput' => __('Please enter a valid email address or phone number.', 'nursery-waiting-list'),
+                'emailLabel' => __('Email Address', 'nursery-waiting-list'),
+                'phoneLabel' => __('Phone Number', 'nursery-waiting-list'),
+                'emailPlaceholder' => __('Enter your email address', 'nursery-waiting-list'),
+                'phonePlaceholder' => __('Enter your phone number', 'nursery-waiting-list'),
+                'notFoundTitle' => __('No Results Found', 'nursery-waiting-list'),
+                'tryAgain' => __('Try Again', 'nursery-waiting-list'),
             ),
         ));
     }
@@ -219,12 +225,12 @@ class NWL_Public {
      */
     private function format_entry_for_public($entry) {
         $entry_handler = NWL_Entry::get_instance();
-        
+
         return array(
             'waiting_list_number' => $entry->waiting_list_number,
             'child_name' => $entry_handler->get_child_name($entry),
             'date_added' => date_i18n(get_option('date_format'), strtotime($entry->created_at)),
-            'room_requested' => $entry_handler->get_room_label($entry->room_requested),
+            'preferred_start_date' => $entry->preferred_start_date ? date_i18n(get_option('date_format'), strtotime($entry->preferred_start_date)) : '',
             'status' => $entry->status,
             'status_label' => $entry_handler->get_status_label($entry->status),
             'status_class' => $this->get_status_class($entry->status),
@@ -275,14 +281,14 @@ class NWL_Public {
                             <span class="nwl-detail-label"><?php esc_html_e('Date Added:', 'nursery-waiting-list'); ?></span>
                             <span class="nwl-detail-value"><?php echo esc_html($entry['date_added']); ?></span>
                         </div>
-                        
-                        <?php if ($entry['room_requested']) : ?>
+
+                        <?php if ($entry['preferred_start_date']) : ?>
                             <div class="nwl-detail-row">
-                                <span class="nwl-detail-label"><?php esc_html_e('Room Requested:', 'nursery-waiting-list'); ?></span>
-                                <span class="nwl-detail-value"><?php echo esc_html($entry['room_requested']); ?></span>
+                                <span class="nwl-detail-label"><?php esc_html_e('Preferred Start Date:', 'nursery-waiting-list'); ?></span>
+                                <span class="nwl-detail-value"><?php echo esc_html($entry['preferred_start_date']); ?></span>
                             </div>
                         <?php endif; ?>
-                        
+
                         <?php if ($entry['offer_deadline']) : ?>
                             <div class="nwl-detail-row nwl-deadline">
                                 <span class="nwl-detail-label"><?php esc_html_e('Response Deadline:', 'nursery-waiting-list'); ?></span>
