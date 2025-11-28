@@ -336,97 +336,432 @@
     line-height: 1.5;
 }
 
-/* Reports Page */
-.nwl-reports-page .nwl-stats-grid {
+/* ==========================================================================
+   Reports Page - Modern Design
+   ========================================================================== */
+
+/* Page Header */
+.nwl-admin-wrap > h1 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 24px;
+    font-weight: 600;
+    color: #1d2327;
+    margin-bottom: 25px;
+}
+
+/* Stats Grid - Overview Cards */
+.nwl-stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     gap: 20px;
-    margin-bottom: 30px;
+    margin-bottom: 0;
 }
 
 .nwl-stat-card {
+    position: relative;
     display: flex;
-    align-items: center;
-    gap: 15px;
-    padding: 20px;
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
+    flex-direction: column;
+    padding: 24px;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease;
+    overflow: hidden;
 }
 
-.nwl-stat-icon {
-    width: 50px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #4A90A4;
-    color: #fff;
-    border-radius: 50%;
+.nwl-stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #4A90A4 0%, #6BB3C7 100%);
+    border-radius: 16px 16px 0 0;
 }
 
-.nwl-stat-icon .dashicons {
-    font-size: 24px;
-    width: 24px;
-    height: 24px;
+.nwl-stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(74, 144, 164, 0.15);
 }
 
 .nwl-stat-card .nwl-stat-number {
     display: block;
-    font-size: 28px;
-    font-weight: 600;
-    color: #23282d;
+    font-size: 36px;
+    font-weight: 700;
+    color: #1d2327;
+    line-height: 1.2;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, #4A90A4 0%, #357a8f 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .nwl-stat-card .nwl-stat-label {
     display: block;
     font-size: 13px;
-    color: #666;
+    font-weight: 500;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
-.nwl-reports-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-}
-
+/* Report Sections */
 .nwl-report-section {
-    background: #fff;
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
-
-.nwl-report-section.nwl-full-width {
-    grid-column: 1 / -1;
+    background: #ffffff;
+    padding: 28px;
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    margin-bottom: 24px;
 }
 
 .nwl-report-section h2 {
-    margin: 0 0 15px;
-    font-size: 16px;
-}
-
-.nwl-chart-container {
-    height: 300px;
-}
-
-.nwl-progress-bar {
     display: flex;
     align-items: center;
     gap: 10px;
+    margin: 0 0 24px;
+    padding-bottom: 16px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1d2327;
+    border-bottom: 2px solid #f1f5f9;
+}
+
+.nwl-report-section h2::before {
+    content: '';
+    display: block;
+    width: 4px;
+    height: 20px;
+    background: linear-gradient(180deg, #4A90A4 0%, #6BB3C7 100%);
+    border-radius: 2px;
+}
+
+/* Report Row - Chart & Table Side by Side */
+.nwl-report-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    align-items: start;
+}
+
+.nwl-report-chart {
+    min-height: 280px;
+    padding: 20px;
+    background: #f8fafc;
+    border-radius: 12px;
+}
+
+.nwl-chart-full {
+    min-height: 200px;
+    padding: 20px;
+    background: #f8fafc;
+    border-radius: 12px;
+}
+
+.nwl-report-table {
+    max-height: 320px;
+    overflow-y: auto;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.nwl-report-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.nwl-report-table table thead {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    position: sticky;
+    top: 0;
+}
+
+.nwl-report-table table th {
+    padding: 14px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #64748b;
+    text-align: left;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.nwl-report-table table td {
+    padding: 14px 16px;
+    font-size: 14px;
+    color: #334155;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.nwl-report-table table tbody tr:hover {
+    background: #f8fafc;
+}
+
+.nwl-report-table table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Attention Grid - Needs Attention Cards */
+.nwl-attention-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+.nwl-attention-card {
+    position: relative;
+    padding: 24px;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    border-left: 4px solid #94a3b8;
+    transition: all 0.3s ease;
+}
+
+.nwl-attention-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.nwl-attention-card h3 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #475569;
+}
+
+.nwl-attention-card h3 .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: #64748b;
+}
+
+.nwl-attention-count {
+    font-size: 42px;
+    font-weight: 700;
+    color: #1d2327;
+    line-height: 1;
+    margin-bottom: 16px;
+}
+
+.nwl-attention-card ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.nwl-attention-card ul li {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 10px 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.nwl-attention-card ul li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.nwl-attention-card ul li a {
+    font-size: 14px;
+    font-weight: 500;
+    color: #4A90A4;
+    text-decoration: none;
+}
+
+.nwl-attention-card ul li a:hover {
+    color: #357a8f;
+    text-decoration: underline;
+}
+
+.nwl-attention-card ul li small {
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.nwl-attention-card .nwl-no-items {
+    margin: 0;
+    font-size: 13px;
+    color: #94a3b8;
+    font-style: italic;
+}
+
+/* Attention Card States */
+.nwl-attention-card.nwl-attention-urgent {
+    border-left-color: #ef4444;
+    background: linear-gradient(135deg, #ffffff 0%, #fef2f2 100%);
+}
+
+.nwl-attention-card.nwl-attention-urgent h3 {
+    color: #dc2626;
+}
+
+.nwl-attention-card.nwl-attention-urgent h3 .dashicons {
+    color: #ef4444;
+}
+
+.nwl-attention-card.nwl-attention-urgent .nwl-attention-count {
+    color: #dc2626;
+}
+
+.nwl-attention-card.nwl-attention-warning {
+    border-left-color: #f59e0b;
+    background: linear-gradient(135deg, #ffffff 0%, #fffbeb 100%);
+}
+
+.nwl-attention-card.nwl-attention-warning h3 {
+    color: #d97706;
+}
+
+.nwl-attention-card.nwl-attention-warning h3 .dashicons {
+    color: #f59e0b;
+}
+
+.nwl-attention-card.nwl-attention-warning .nwl-attention-count {
+    color: #d97706;
+}
+
+/* Export Section */
+.nwl-export-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.nwl-export-options .button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.nwl-export-options .button-primary {
+    background: linear-gradient(135deg, #4A90A4 0%, #357a8f 100%);
+    border: none;
+    box-shadow: 0 2px 8px rgba(74, 144, 164, 0.3);
+}
+
+.nwl-export-options .button-primary:hover {
+    background: linear-gradient(135deg, #357a8f 0%, #2d6576 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(74, 144, 164, 0.4);
+}
+
+.nwl-export-options .button:not(.button-primary) {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    color: #475569;
+}
+
+.nwl-export-options .button:not(.button-primary):hover {
+    background: #f8fafc;
+    border-color: #4A90A4;
+    color: #4A90A4;
+}
+
+/* Reports Responsive */
+@media screen and (max-width: 1400px) {
+    .nwl-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .nwl-attention-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media screen and (max-width: 1200px) {
+    .nwl-report-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media screen and (max-width: 782px) {
+    .nwl-stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .nwl-attention-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .nwl-stat-card .nwl-stat-number {
+        font-size: 28px;
+    }
+
+    .nwl-attention-count {
+        font-size: 32px;
+    }
+
+    .nwl-export-options {
+        flex-direction: column;
+    }
+
+    .nwl-export-options .button {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Progress Bar Enhancement */
+.nwl-progress-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.nwl-progress-track {
+    flex: 1;
+    height: 8px;
+    background: #e2e8f0;
+    border-radius: 4px;
+    overflow: hidden;
 }
 
 .nwl-progress {
-    height: 8px;
-    background: #4A90A4;
+    height: 100%;
+    background: linear-gradient(90deg, #4A90A4 0%, #6BB3C7 100%);
     border-radius: 4px;
-    transition: width 0.3s;
+    transition: width 0.5s ease;
 }
 
-/* Attention Boxes */
+.nwl-progress-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #475569;
+    min-width: 45px;
+    text-align: right;
+}
+
+/* Chart Container Enhancement */
+.nwl-chart-container {
+    position: relative;
+    height: 300px;
+    padding: 20px;
+    background: #f8fafc;
+    border-radius: 12px;
+}
+
+/* Attention Boxes (Legacy Support) */
 .nwl-attention-box {
-    padding: 15px;
-    border-radius: 4px;
+    padding: 20px;
+    border-radius: 12px;
     margin-bottom: 15px;
 }
 
