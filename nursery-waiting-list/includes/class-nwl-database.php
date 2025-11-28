@@ -29,6 +29,7 @@ class NWL_Database {
         $installed_version = get_option('nwl_db_version', '0');
         if (version_compare($installed_version, NWL_VERSION, '<')) {
             self::create_tables();
+            self::insert_default_templates(); // Update system templates
             update_option('nwl_db_version', NWL_VERSION);
         }
     }
@@ -226,14 +227,26 @@ class NWL_Database {
         );
 
         foreach ($templates as $template) {
-            $exists = $wpdb->get_var($wpdb->prepare(
-                "SELECT id FROM $table WHERE template_key = %s",
+            $existing = $wpdb->get_row($wpdb->prepare(
+                "SELECT id, is_system FROM $table WHERE template_key = %s",
                 $template['template_key']
             ));
-            
-            if (!$exists) {
+
+            if (!$existing) {
+                // Insert new template
                 $wpdb->insert($table, $template);
+            } elseif ($existing->is_system) {
+                // Update existing system template with new content
+                $wpdb->update(
+                    $table,
+                    array(
+                        'body' => $template['body'],
+                        'updated_at' => current_time('mysql'),
+                    ),
+                    array('id' => $existing->id)
+                );
             }
+            // Non-system templates (customized by user) are not updated
         }
     }
 

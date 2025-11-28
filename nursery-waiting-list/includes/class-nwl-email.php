@@ -202,12 +202,26 @@ class NWL_Email {
      */
     public function get_template($key) {
         global $wpdb;
-        
+
         $table = $wpdb->prefix . NWL_TABLE_TEMPLATES;
-        
+
         return $wpdb->get_row($wpdb->prepare(
             "SELECT * FROM $table WHERE template_key = %s AND is_active = 1",
             $key
+        ));
+    }
+
+    /**
+     * Get email template by ID
+     */
+    public function get_template_by_id($id) {
+        global $wpdb;
+
+        $table = $wpdb->prefix . NWL_TABLE_TEMPLATES;
+
+        return $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM $table WHERE id = %d AND is_active = 1",
+            $id
         ));
     }
 

@@ -769,34 +769,52 @@ class NWL_Admin_Entries {
      * AJAX: Save entry
      */
     public function ajax_save_entry() {
-        check_ajax_referer('nwl_save_entry', 'nwl_entry_nonce');
+        // Verify nonce
+        if (!check_ajax_referer('nwl_save_entry', 'nwl_entry_nonce', false)) {
+            wp_send_json_error(array('message' => __('Security check failed. Please refresh the page and try again.', 'nursery-waiting-list')));
+            return;
+        }
 
         if (!current_user_can('nwl_edit_entries')) {
             wp_send_json_error(array('message' => __('Permission denied.', 'nursery-waiting-list')));
+            return;
+        }
+
+        // Validate required fields
+        $required_fields = array('child_first_name', 'child_last_name', 'parent_first_name', 'parent_last_name', 'parent_email');
+        foreach ($required_fields as $field) {
+            if (empty($_POST[$field])) {
+                wp_send_json_error(array('message' => sprintf(__('The %s field is required.', 'nursery-waiting-list'), str_replace('_', ' ', $field))));
+                return;
+            }
+        }
+
+        // Validate email format
+        if (!is_email($_POST['parent_email'])) {
+            wp_send_json_error(array('message' => __('Please enter a valid email address.', 'nursery-waiting-list')));
+            return;
         }
 
         $entry_id = isset($_POST['entry_id']) ? absint($_POST['entry_id']) : 0;
-        
+
         $data = array(
-            'child_first_name' => sanitize_text_field($_POST['child_first_name']),
-            'child_last_name' => sanitize_text_field($_POST['child_last_name']),
-            'child_dob' => sanitize_text_field($_POST['child_dob']),
-            'child_gender' => sanitize_text_field($_POST['child_gender']),
-            'parent_first_name' => sanitize_text_field($_POST['parent_first_name']),
-            'parent_last_name' => sanitize_text_field($_POST['parent_last_name']),
-            'parent_email' => sanitize_email($_POST['parent_email']),
-            'parent_phone' => sanitize_text_field($_POST['parent_phone']),
-            'parent_mobile' => sanitize_text_field($_POST['parent_mobile']),
-            'parent_address_line1' => sanitize_text_field($_POST['parent_address_line1']),
-            'parent_address_line2' => sanitize_text_field($_POST['parent_address_line2']),
-            'parent_city' => sanitize_text_field($_POST['parent_city']),
-            'parent_postcode' => sanitize_text_field($_POST['parent_postcode']),
-            'age_group' => sanitize_text_field($_POST['age_group']),
-            'preferred_start_date' => sanitize_text_field($_POST['preferred_start_date']),
-            'days_required' => sanitize_text_field($_POST['days_required']),
-            'hours_per_week' => absint($_POST['hours_per_week']),
-            'internal_notes' => sanitize_textarea_field($_POST['internal_notes']),
-            'public_notes' => sanitize_textarea_field($_POST['public_notes']),
+            'child_first_name' => sanitize_text_field($_POST['child_first_name'] ?? ''),
+            'child_last_name' => sanitize_text_field($_POST['child_last_name'] ?? ''),
+            'child_dob' => sanitize_text_field($_POST['child_dob'] ?? ''),
+            'child_gender' => sanitize_text_field($_POST['child_gender'] ?? ''),
+            'parent_first_name' => sanitize_text_field($_POST['parent_first_name'] ?? ''),
+            'parent_last_name' => sanitize_text_field($_POST['parent_last_name'] ?? ''),
+            'parent_email' => sanitize_email($_POST['parent_email'] ?? ''),
+            'parent_mobile' => sanitize_text_field($_POST['parent_mobile'] ?? ''),
+            'parent_address_line1' => sanitize_text_field($_POST['parent_address_line1'] ?? ''),
+            'parent_city' => sanitize_text_field($_POST['parent_city'] ?? ''),
+            'parent_postcode' => sanitize_text_field($_POST['parent_postcode'] ?? ''),
+            'age_group' => sanitize_text_field($_POST['age_group'] ?? ''),
+            'preferred_start_date' => sanitize_text_field($_POST['preferred_start_date'] ?? ''),
+            'days_required' => sanitize_text_field($_POST['days_required'] ?? ''),
+            'hours_per_week' => absint($_POST['hours_per_week'] ?? 0),
+            'internal_notes' => sanitize_textarea_field($_POST['internal_notes'] ?? ''),
+            'public_notes' => sanitize_textarea_field($_POST['public_notes'] ?? ''),
         );
 
         // Add status and priority if present
