@@ -54,11 +54,19 @@ class NWL_Database {
             child_first_name varchar(100) NOT NULL,
             child_last_name varchar(100) NOT NULL,
             child_dob date DEFAULT NULL,
+            child_place_of_birth_city varchar(100) DEFAULT NULL,
+            child_place_of_birth_country varchar(100) DEFAULT NULL,
+            child_first_language varchar(100) DEFAULT NULL,
+            child_ethnicity varchar(100) DEFAULT NULL,
             child_gender varchar(20) DEFAULT NULL,
+            child_attended_other_nursery tinyint(1) DEFAULT 0,
+            child_previous_nursery_name varchar(255) DEFAULT NULL,
 
             -- Parent/Carer Information
             parent_first_name varchar(100) NOT NULL,
             parent_last_name varchar(100) NOT NULL,
+            parent_dob date DEFAULT NULL,
+            parent_national_insurance varchar(20) DEFAULT NULL,
             parent_email varchar(255) NOT NULL,
             parent_phone varchar(50) DEFAULT NULL,
             parent_mobile varchar(50) DEFAULT NULL,
@@ -66,6 +74,9 @@ class NWL_Database {
             parent_address_line2 varchar(255) DEFAULT NULL,
             parent_city varchar(100) DEFAULT NULL,
             parent_postcode varchar(20) DEFAULT NULL,
+            parental_responsibility varchar(100) DEFAULT NULL,
+            relationship_to_child varchar(100) DEFAULT NULL,
+            declaration tinyint(1) DEFAULT 0,
 
             -- Waiting List Details
             age_group varchar(50) DEFAULT NULL,

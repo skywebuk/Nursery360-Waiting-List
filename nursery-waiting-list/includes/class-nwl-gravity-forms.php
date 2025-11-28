@@ -124,10 +124,31 @@ class NWL_Gravity_Forms {
                         $values[] = $value;
                     }
                 }
-                $data[$wl_field] = implode(', ', $values);
+                // Handle boolean fields (Yes/No answers)
+                if (in_array($wl_field, array('child_attended_other_nursery', 'declaration'))) {
+                    $data[$wl_field] = !empty($values) ? 1 : 0;
+                } else {
+                    $data[$wl_field] = implode(', ', $values);
+                }
+            } elseif ($field && $field->type === 'radio') {
+                // Radio field - handle Yes/No type answers for boolean fields
+                $value = rgar($entry, $gf_field_id);
+                if (in_array($wl_field, array('child_attended_other_nursery', 'declaration'))) {
+                    $yes_values = array('yes', 'true', '1', 'oui');
+                    $data[$wl_field] = in_array(strtolower($value), $yes_values) ? 1 : 0;
+                } else {
+                    $data[$wl_field] = $value;
+                }
             } else {
                 // Standard field
-                $data[$wl_field] = rgar($entry, $gf_field_id);
+                $value = rgar($entry, $gf_field_id);
+                // Handle boolean fields that might come from text/select
+                if (in_array($wl_field, array('child_attended_other_nursery', 'declaration'))) {
+                    $yes_values = array('yes', 'true', '1', 'oui');
+                    $data[$wl_field] = in_array(strtolower($value), $yes_values) ? 1 : 0;
+                } else {
+                    $data[$wl_field] = $value;
+                }
             }
         }
 
@@ -250,18 +271,30 @@ class NWL_Gravity_Forms {
             __('Child Information', 'nursery-waiting-list') => array(
                 'child_name' => __('Child Name (Name field)', 'nursery-waiting-list'),
                 'child_dob' => __('Child Date of Birth', 'nursery-waiting-list'),
+                'child_place_of_birth_city' => __('Child Place of Birth (City)', 'nursery-waiting-list'),
+                'child_place_of_birth_country' => __('Child Place of Birth (Country)', 'nursery-waiting-list'),
+                'child_first_language' => __('Child First Language', 'nursery-waiting-list'),
+                'child_ethnicity' => __('Ethnicity', 'nursery-waiting-list'),
                 'child_gender' => __('Child Gender', 'nursery-waiting-list'),
+                'child_attended_other_nursery' => __('Has your child attended another nursery?', 'nursery-waiting-list'),
+                'child_previous_nursery_name' => __('Enter name of nursery', 'nursery-waiting-list'),
+                'preferred_start_date' => __('What date would you like to start?', 'nursery-waiting-list'),
+                'days_required' => __('Please select your preferred days', 'nursery-waiting-list'),
             ),
             __('Parent/Guardian Information', 'nursery-waiting-list') => array(
                 'parent_name' => __('Parent Name (Name field)', 'nursery-waiting-list'),
+                'parent_dob' => __('Parent Date of Birth', 'nursery-waiting-list'),
+                'parent_national_insurance' => __('Parent National Insurance Number', 'nursery-waiting-list'),
                 'parent_email' => __('Parent Email', 'nursery-waiting-list'),
+                'parent_phone' => __('Parent Phone Number', 'nursery-waiting-list'),
                 'parent_mobile' => __('Parent Mobile', 'nursery-waiting-list'),
                 'parent_address' => __('Parent Address (Address field - maps to Address, City, Postcode)', 'nursery-waiting-list'),
+                'parental_responsibility' => __('Parental Responsibility', 'nursery-waiting-list'),
+                'relationship_to_child' => __('Relationship to Child', 'nursery-waiting-list'),
+                'declaration' => __('Declaration', 'nursery-waiting-list'),
             ),
             __('Waiting List Details', 'nursery-waiting-list') => array(
                 'age_group' => __('Age Group', 'nursery-waiting-list'),
-                'preferred_start_date' => __('Preferred Start Date', 'nursery-waiting-list'),
-                'days_required' => __('Days Required', 'nursery-waiting-list'),
                 'sessions_required' => __('Sessions Required', 'nursery-waiting-list'),
                 'hours_per_week' => __('Hours Per Week', 'nursery-waiting-list'),
             ),
