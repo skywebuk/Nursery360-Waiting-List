@@ -216,6 +216,13 @@ class NWL_Database {
                 'body' => self::get_default_status_template(),
                 'is_system' => 1,
             ),
+            array(
+                'template_key' => 'admin_notification',
+                'template_name' => 'Admin: New Registration',
+                'subject' => 'New Waiting List Application - {{child_name}}',
+                'body' => self::get_admin_notification_template(),
+                'is_system' => 1,
+            ),
         );
 
         foreach ($templates as $template) {
@@ -638,6 +645,117 @@ class NWL_Database {
                             <p style="color: #888; font-size: 13px; margin: 0 0 5px;">{{nursery_name}}</p>
                             <p style="color: #888; font-size: 13px; margin: 0 0 5px;">{{nursery_address}}</p>
                             <p style="color: #888; font-size: 13px; margin: 0;">Tel: {{nursery_phone}} | Email: {{nursery_email}}</p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>';
+    }
+
+    /**
+     * Admin notification template - Modern UK Nursery Style
+     */
+    private static function get_admin_notification_template() {
+        return '<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Waiting List Application</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, \'Helvetica Neue\', Arial, sans-serif; background-color: #f4f7fa; line-height: 1.6;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f4f7fa;">
+        <tr>
+            <td align="center" style="padding: 40px 20px;">
+                <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="max-width: 600px; width: 100%;">
+                    <!-- Header -->
+                    <tr>
+                        <td style="background: linear-gradient(135deg, #17a2b8 0%, #117a8b 100%); padding: 30px; text-align: center; border-radius: 12px 12px 0 0;">
+                            <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 600;">New Waiting List Application</h1>
+                        </td>
+                    </tr>
+                    <!-- Content -->
+                    <tr>
+                        <td style="background: #ffffff; padding: 30px; border-radius: 0 0 12px 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+                            <p style="color: #333; font-size: 15px; margin: 0 0 20px;">A new waiting list application has been submitted and requires your attention.</p>
+
+                            <!-- Child Details -->
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background: #e8f4f8; border-radius: 8px; margin: 20px 0;">
+                                <tr>
+                                    <td style="padding: 20px; border-left: 4px solid #17a2b8;">
+                                        <h3 style="color: #333; margin: 0 0 12px; font-size: 15px;">Child Details</h3>
+                                        <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                                            <tr>
+                                                <td style="padding: 6px 0; color: #666; font-size: 13px; width: 40%;">Name:</td>
+                                                <td style="padding: 6px 0; color: #333; font-size: 13px; font-weight: 600;">{{child_name}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 6px 0; color: #666; font-size: 13px;">Date of Birth:</td>
+                                                <td style="padding: 6px 0; color: #333; font-size: 13px; font-weight: 600;">{{child_dob}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 6px 0; color: #666; font-size: 13px;">Age Group:</td>
+                                                <td style="padding: 6px 0; color: #333; font-size: 13px; font-weight: 600;">{{age_group}}</td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- Parent Details -->
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background: #f8f9fa; border-radius: 8px; margin: 20px 0;">
+                                <tr>
+                                    <td style="padding: 20px; border-left: 4px solid #6c757d;">
+                                        <h3 style="color: #333; margin: 0 0 12px; font-size: 15px;">Parent/Carer Details</h3>
+                                        <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                                            <tr>
+                                                <td style="padding: 6px 0; color: #666; font-size: 13px; width: 40%;">Name:</td>
+                                                <td style="padding: 6px 0; color: #333; font-size: 13px; font-weight: 600;">{{parent_name}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 6px 0; color: #666; font-size: 13px;">Email:</td>
+                                                <td style="padding: 6px 0; color: #333; font-size: 13px; font-weight: 600;">{{parent_email}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 6px 0; color: #666; font-size: 13px;">Mobile:</td>
+                                                <td style="padding: 6px 0; color: #333; font-size: 13px; font-weight: 600;">{{parent_mobile}}</td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- Application Info -->
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background: #fff3cd; border-radius: 8px; margin: 20px 0;">
+                                <tr>
+                                    <td style="padding: 20px; border-left: 4px solid #ffc107;">
+                                        <h3 style="color: #856404; margin: 0 0 12px; font-size: 15px;">Application Information</h3>
+                                        <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                                            <tr>
+                                                <td style="padding: 6px 0; color: #856404; font-size: 13px; width: 40%;">Reference:</td>
+                                                <td style="padding: 6px 0; color: #333; font-size: 13px; font-weight: 600;">{{waiting_list_number}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 6px 0; color: #856404; font-size: 13px;">Submitted:</td>
+                                                <td style="padding: 6px 0; color: #333; font-size: 13px; font-weight: 600;">{{date_added}}</td>
+                                            </tr>
+                                            {{#preferred_start_date}}
+                                            <tr>
+                                                <td style="padding: 6px 0; color: #856404; font-size: 13px;">Preferred Start:</td>
+                                                <td style="padding: 6px 0; color: #333; font-size: 13px; font-weight: 600;">{{preferred_start_date}}</td>
+                                            </tr>
+                                            {{/preferred_start_date}}
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <p style="color: #666; font-size: 13px; margin: 20px 0 0; text-align: center;">
+                                <em>This is an automated notification from the {{nursery_name}} waiting list system.</em>
+                            </p>
                         </td>
                     </tr>
                 </table>

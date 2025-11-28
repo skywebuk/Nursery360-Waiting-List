@@ -105,15 +105,6 @@ class NWL_Admin_Messaging {
                                             </select>
                                         </div>
                                         <div class="nwl-form-field">
-                                            <label for="filter_room"><?php esc_html_e('Room', 'nursery-waiting-list'); ?></label>
-                                            <select id="filter_room" name="filter_room">
-                                                <option value=""><?php esc_html_e('All Rooms', 'nursery-waiting-list'); ?></option>
-                                                <?php foreach (NWL_Database::get_rooms() as $key => $label) : ?>
-                                                    <option value="<?php echo esc_attr($key); ?>"><?php echo esc_html($label); ?></option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                        </div>
-                                        <div class="nwl-form-field">
                                             <label for="filter_priority"><?php esc_html_e('Priority', 'nursery-waiting-list'); ?></label>
                                             <select id="filter_priority" name="filter_priority">
                                                 <option value=""><?php esc_html_e('All Priorities', 'nursery-waiting-list'); ?></option>
@@ -210,7 +201,6 @@ class NWL_Admin_Messaging {
                             <li><code class="nwl-copy-var">{{parent_name}}</code></li>
                             <li><code class="nwl-copy-var">{{waiting_list_number}}</code></li>
                             <li><code class="nwl-copy-var">{{date_added}}</code></li>
-                            <li><code class="nwl-copy-var">{{room_requested}}</code></li>
                             <li><code class="nwl-copy-var">{{status}}</code></li>
                             <li><code class="nwl-copy-var">{{nursery_name}}</code></li>
                             <li><code class="nwl-copy-var">{{stats_page_url}}</code></li>
@@ -264,7 +254,7 @@ class NWL_Admin_Messaging {
             });
 
             // Filter changes
-            $('#filter_status, #filter_room, #filter_priority').on('change', function() {
+            $('#filter_status, #filter_priority').on('change', function() {
                 updateRecipientCount();
             });
 
@@ -281,7 +271,6 @@ class NWL_Admin_Messaging {
                     action: 'nwl_get_filtered_count',
                     nonce: nwlAdmin.nonce,
                     status: $('#filter_status').val(),
-                    room: $('#filter_room').val(),
                     priority: $('#filter_priority').val()
                 }, function(response) {
                     if (response.success) {
@@ -299,12 +288,98 @@ class NWL_Admin_Messaging {
             $(document).on('click', '.nwl-copy-var', function() {
                 var text = $(this).text();
                 navigator.clipboard.writeText(text);
-                
+
                 var $this = $(this);
                 $this.addClass('copied');
                 setTimeout(function() {
                     $this.removeClass('copied');
                 }, 1000);
+            });
+
+            // Form submission handler
+            $('#nwl-send-email-form').on('submit', function(e) {
+                e.preventDefault();
+
+                var $form = $(this);
+                var $btn = $('#nwl-send-btn');
+                var $spinner = $('#nwl-send-spinner');
+                var templateId = $('#template_id').val();
+
+                // Validation
+                if (!templateId) {
+                    alert('<?php esc_html_e('Please select an email template.', 'nursery-waiting-list'); ?>');
+                    return false;
+                }
+
+                // Custom email validation
+                if (templateId === 'custom') {
+                    var customSubject = $('#custom_subject').val();
+                    var customBody = '';
+
+                    // Get content from TinyMCE editor if active
+                    if (typeof tinyMCE !== 'undefined' && tinyMCE.get('custom_body')) {
+                        customBody = tinyMCE.get('custom_body').getContent();
+                    } else {
+                        customBody = $('#custom_body').val();
+                    }
+
+                    if (!customSubject.trim()) {
+                        alert('<?php esc_html_e('Please enter a subject for your custom email.', 'nursery-waiting-list'); ?>');
+                        return false;
+                    }
+
+                    if (!customBody.trim()) {
+                        alert('<?php esc_html_e('Please enter a message for your custom email.', 'nursery-waiting-list'); ?>');
+                        return false;
+                    }
+                }
+
+                // Show loading state
+                $btn.prop('disabled', true);
+                $spinner.addClass('is-active');
+
+                // Prepare form data
+                var formData = $form.serialize();
+
+                // Sync TinyMCE content if using custom email
+                if (templateId === 'custom' && typeof tinyMCE !== 'undefined' && tinyMCE.get('custom_body')) {
+                    tinyMCE.triggerSave();
+                    formData = $form.serialize();
+                }
+
+                // Send AJAX request
+                $.ajax({
+                    url: nwlAdmin.ajaxUrl,
+                    type: 'POST',
+                    data: formData + '&action=nwl_send_email',
+                    success: function(response) {
+                        if (response.success) {
+                            alert(response.data.message);
+
+                            // Show any errors
+                            if (response.data.errors && response.data.errors.length > 0) {
+                                console.log('Email errors:', response.data.errors);
+                            }
+
+                            // Redirect back to entries if was sending to selected entries
+                            if ($('input[name="send_mode"][value="selected"]').length) {
+                                window.location.href = '<?php echo esc_url(NWL_Admin::get_page_url('nwl-entries')); ?>';
+                            }
+                        } else {
+                            alert(response.data.message || '<?php esc_html_e('An error occurred. Please try again.', 'nursery-waiting-list'); ?>');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        alert('<?php esc_html_e('An error occurred. Please try again.', 'nursery-waiting-list'); ?>');
+                        console.error('AJAX error:', error);
+                    },
+                    complete: function() {
+                        $btn.prop('disabled', false);
+                        $spinner.removeClass('is-active');
+                    }
+                });
+
+                return false;
             });
         });
         </script>
@@ -348,7 +423,6 @@ class NWL_Admin_Messaging {
             
             if ($send_mode === 'filtered') {
                 $args['status'] = isset($_POST['filter_status']) ? sanitize_text_field($_POST['filter_status']) : '';
-                $args['room'] = isset($_POST['filter_room']) ? sanitize_text_field($_POST['filter_room']) : '';
                 $args['priority'] = isset($_POST['filter_priority']) ? sanitize_text_field($_POST['filter_priority']) : '';
             }
             
@@ -446,7 +520,6 @@ class NWL_Admin_Messaging {
 
         $args = array(
             'status' => isset($_POST['status']) ? sanitize_text_field($_POST['status']) : '',
-            'room' => isset($_POST['room']) ? sanitize_text_field($_POST['room']) : '',
             'priority' => isset($_POST['priority']) ? sanitize_text_field($_POST['priority']) : '',
             'per_page' => 1,
             'page' => 1,

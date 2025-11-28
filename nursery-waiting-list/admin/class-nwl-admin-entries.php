@@ -216,8 +216,8 @@ class NWL_Admin_Entries {
                                     <td>
                                         <?php echo esc_html($entry_handler->get_parent_name($entry)); ?>
                                         <br><small><a href="mailto:<?php echo esc_attr($entry->parent_email); ?>"><?php echo esc_html($entry->parent_email); ?></a></small>
-                                        <?php if ($entry->parent_phone) : ?>
-                                            <br><small><?php echo esc_html($entry->parent_phone); ?></small>
+                                        <?php if ($entry->parent_mobile) : ?>
+                                            <br><small><?php echo esc_html($entry->parent_mobile); ?></small>
                                         <?php endif; ?>
                                     </td>
                                     <td>
@@ -354,43 +354,34 @@ class NWL_Admin_Entries {
                             <div class="nwl-form-row">
                                 <div class="nwl-form-field">
                                     <label for="parent_email"><?php esc_html_e('Email', 'nursery-waiting-list'); ?> <span class="required">*</span></label>
-                                    <input type="email" id="parent_email" name="parent_email" 
+                                    <input type="email" id="parent_email" name="parent_email"
                                            value="<?php echo $is_edit ? esc_attr($entry->parent_email) : ''; ?>" required>
                                 </div>
                                 <div class="nwl-form-field">
-                                    <label for="parent_phone"><?php esc_html_e('Phone', 'nursery-waiting-list'); ?></label>
-                                    <input type="tel" id="parent_phone" name="parent_phone" 
-                                           value="<?php echo $is_edit ? esc_attr($entry->parent_phone) : ''; ?>">
-                                </div>
-                                <div class="nwl-form-field">
                                     <label for="parent_mobile"><?php esc_html_e('Mobile', 'nursery-waiting-list'); ?></label>
-                                    <input type="tel" id="parent_mobile" name="parent_mobile" 
+                                    <input type="tel" id="parent_mobile" name="parent_mobile"
                                            value="<?php echo $is_edit ? esc_attr($entry->parent_mobile) : ''; ?>">
                                 </div>
                             </div>
 
                             <div class="nwl-form-row">
-                                <div class="nwl-form-field">
-                                    <label for="parent_address_line1"><?php esc_html_e('Address Line 1', 'nursery-waiting-list'); ?></label>
-                                    <input type="text" id="parent_address_line1" name="parent_address_line1" 
-                                           value="<?php echo $is_edit ? esc_attr($entry->parent_address_line1) : ''; ?>">
-                                </div>
-                                <div class="nwl-form-field">
-                                    <label for="parent_address_line2"><?php esc_html_e('Address Line 2', 'nursery-waiting-list'); ?></label>
-                                    <input type="text" id="parent_address_line2" name="parent_address_line2" 
-                                           value="<?php echo $is_edit ? esc_attr($entry->parent_address_line2) : ''; ?>">
+                                <div class="nwl-form-field nwl-full-width">
+                                    <label for="parent_address_line1"><?php esc_html_e('Address', 'nursery-waiting-list'); ?></label>
+                                    <input type="text" id="parent_address_line1" name="parent_address_line1"
+                                           value="<?php echo $is_edit ? esc_attr($entry->parent_address_line1) : ''; ?>"
+                                           placeholder="<?php esc_attr_e('Street address', 'nursery-waiting-list'); ?>">
                                 </div>
                             </div>
 
                             <div class="nwl-form-row">
                                 <div class="nwl-form-field">
-                                    <label for="parent_city"><?php esc_html_e('City', 'nursery-waiting-list'); ?></label>
-                                    <input type="text" id="parent_city" name="parent_city" 
+                                    <label for="parent_city"><?php esc_html_e('City/Town', 'nursery-waiting-list'); ?></label>
+                                    <input type="text" id="parent_city" name="parent_city"
                                            value="<?php echo $is_edit ? esc_attr($entry->parent_city) : ''; ?>">
                                 </div>
                                 <div class="nwl-form-field">
                                     <label for="parent_postcode"><?php esc_html_e('Postcode', 'nursery-waiting-list'); ?></label>
-                                    <input type="text" id="parent_postcode" name="parent_postcode" 
+                                    <input type="text" id="parent_postcode" name="parent_postcode"
                                            value="<?php echo $is_edit ? esc_attr($entry->parent_postcode) : ''; ?>">
                                 </div>
                             </div>

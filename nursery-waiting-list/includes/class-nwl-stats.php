@@ -65,40 +65,6 @@ class NWL_Stats {
     }
 
     /**
-     * Get counts by room
-     */
-    public function get_counts_by_room() {
-        global $wpdb;
-        
-        $table = $wpdb->prefix . NWL_TABLE_ENTRIES;
-        
-        $results = $wpdb->get_results(
-            "SELECT room_requested, COUNT(*) as count FROM $table 
-            WHERE status NOT IN ('removed', 'declined')
-            GROUP BY room_requested",
-            OBJECT_K
-        );
-        
-        $counts = array();
-        $rooms = NWL_Database::get_rooms();
-        
-        foreach ($rooms as $key => $label) {
-            $counts[$key] = array(
-                'label' => $label,
-                'count' => isset($results[$key]) ? (int) $results[$key]->count : 0,
-            );
-        }
-        
-        // Handle unassigned
-        $counts['unassigned'] = array(
-            'label' => __('Unassigned', 'nursery-waiting-list'),
-            'count' => isset($results['']) ? (int) $results['']->count : 0,
-        );
-        
-        return $counts;
-    }
-
-    /**
      * Get counts by age group
      */
     public function get_counts_by_age_group() {
@@ -256,7 +222,7 @@ class NWL_Stats {
         return array(
             'total_active' => $this->get_total_entries(true),
             'by_status' => $this->get_counts_by_status(),
-            'by_room' => $this->get_counts_by_room(),
+            'by_age_group' => $this->get_counts_by_age_group(),
             'average_wait' => $this->get_average_waiting_time(),
             'monthly_trends' => $this->get_monthly_trends(6),
             'conversion' => $this->get_conversion_stats(),
