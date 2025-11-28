@@ -390,14 +390,24 @@ class NWL_Admin_Messaging {
      * AJAX: Send email
      */
     public function ajax_send_email() {
-        check_ajax_referer('nwl_send_email', 'nwl_email_nonce');
+        // Verify nonce
+        if (!check_ajax_referer('nwl_send_email', 'nwl_email_nonce', false)) {
+            wp_send_json_error(array('message' => __('Security check failed. Please refresh the page and try again.', 'nursery-waiting-list')));
+            return;
+        }
 
         if (!current_user_can('nwl_send_emails')) {
             wp_send_json_error(array('message' => __('Permission denied.', 'nursery-waiting-list')));
+            return;
         }
 
-        $send_mode = sanitize_text_field($_POST['send_mode']);
-        $template_id = sanitize_text_field($_POST['template_id']);
+        $send_mode = isset($_POST['send_mode']) ? sanitize_text_field($_POST['send_mode']) : '';
+        $template_id = isset($_POST['template_id']) ? sanitize_text_field($_POST['template_id']) : '';
+
+        if (empty($template_id)) {
+            wp_send_json_error(array('message' => __('Please select an email template.', 'nursery-waiting-list')));
+            return;
+        }
         $message_content = isset($_POST['message_content']) ? sanitize_textarea_field($_POST['message_content']) : '';
 
         $email_handler = NWL_Email::get_instance();

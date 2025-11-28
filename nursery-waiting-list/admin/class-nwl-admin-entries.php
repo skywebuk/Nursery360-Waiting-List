@@ -303,16 +303,16 @@ class NWL_Admin_Entries {
                         <!-- Child Information -->
                         <div class="nwl-form-section">
                             <h2><?php esc_html_e('Child Information', 'nursery-waiting-list'); ?></h2>
-                            
+
                             <div class="nwl-form-row">
                                 <div class="nwl-form-field">
                                     <label for="child_first_name"><?php esc_html_e('First Name', 'nursery-waiting-list'); ?> <span class="required">*</span></label>
-                                    <input type="text" id="child_first_name" name="child_first_name" 
+                                    <input type="text" id="child_first_name" name="child_first_name"
                                            value="<?php echo $is_edit ? esc_attr($entry->child_first_name) : ''; ?>" required>
                                 </div>
                                 <div class="nwl-form-field">
                                     <label for="child_last_name"><?php esc_html_e('Last Name', 'nursery-waiting-list'); ?> <span class="required">*</span></label>
-                                    <input type="text" id="child_last_name" name="child_last_name" 
+                                    <input type="text" id="child_last_name" name="child_last_name"
                                            value="<?php echo $is_edit ? esc_attr($entry->child_last_name) : ''; ?>" required>
                                 </div>
                             </div>
@@ -320,7 +320,7 @@ class NWL_Admin_Entries {
                             <div class="nwl-form-row">
                                 <div class="nwl-form-field">
                                     <label for="child_dob"><?php esc_html_e('Date of Birth', 'nursery-waiting-list'); ?></label>
-                                    <input type="date" id="child_dob" name="child_dob" 
+                                    <input type="date" id="child_dob" name="child_dob"
                                            value="<?php echo $is_edit ? esc_attr($entry->child_dob) : ''; ?>">
                                 </div>
                                 <div class="nwl-form-field">
@@ -332,22 +332,77 @@ class NWL_Admin_Entries {
                                     </select>
                                 </div>
                             </div>
+
+                            <div class="nwl-form-row">
+                                <div class="nwl-form-field">
+                                    <label for="child_place_of_birth_city"><?php esc_html_e('Place of Birth (City)', 'nursery-waiting-list'); ?></label>
+                                    <input type="text" id="child_place_of_birth_city" name="child_place_of_birth_city"
+                                           value="<?php echo $is_edit ? esc_attr($entry->child_place_of_birth_city) : ''; ?>">
+                                </div>
+                                <div class="nwl-form-field">
+                                    <label for="child_place_of_birth_country"><?php esc_html_e('Place of Birth (Country)', 'nursery-waiting-list'); ?></label>
+                                    <input type="text" id="child_place_of_birth_country" name="child_place_of_birth_country"
+                                           value="<?php echo $is_edit ? esc_attr($entry->child_place_of_birth_country) : ''; ?>">
+                                </div>
+                            </div>
+
+                            <div class="nwl-form-row">
+                                <div class="nwl-form-field">
+                                    <label for="child_first_language"><?php esc_html_e('First Language', 'nursery-waiting-list'); ?></label>
+                                    <input type="text" id="child_first_language" name="child_first_language"
+                                           value="<?php echo $is_edit ? esc_attr($entry->child_first_language) : ''; ?>">
+                                </div>
+                                <div class="nwl-form-field">
+                                    <label for="child_ethnicity"><?php esc_html_e('Ethnicity', 'nursery-waiting-list'); ?></label>
+                                    <input type="text" id="child_ethnicity" name="child_ethnicity"
+                                           value="<?php echo $is_edit ? esc_attr($entry->child_ethnicity) : ''; ?>">
+                                </div>
+                            </div>
+
+                            <div class="nwl-form-row">
+                                <div class="nwl-form-field">
+                                    <label for="child_attended_other_nursery"><?php esc_html_e('Has your child attended another nursery?', 'nursery-waiting-list'); ?></label>
+                                    <select id="child_attended_other_nursery" name="child_attended_other_nursery">
+                                        <option value="0" <?php selected($is_edit ? $entry->child_attended_other_nursery : '', '0'); ?>><?php esc_html_e('No', 'nursery-waiting-list'); ?></option>
+                                        <option value="1" <?php selected($is_edit ? $entry->child_attended_other_nursery : '', '1'); ?>><?php esc_html_e('Yes', 'nursery-waiting-list'); ?></option>
+                                    </select>
+                                </div>
+                                <div class="nwl-form-field">
+                                    <label for="child_previous_nursery_name"><?php esc_html_e('Name of Previous Nursery', 'nursery-waiting-list'); ?></label>
+                                    <input type="text" id="child_previous_nursery_name" name="child_previous_nursery_name"
+                                           value="<?php echo $is_edit ? esc_attr($entry->child_previous_nursery_name) : ''; ?>">
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Parent/Carer Information -->
                         <div class="nwl-form-section">
                             <h2><?php esc_html_e('Parent/Carer Information', 'nursery-waiting-list'); ?></h2>
-                            
+
                             <div class="nwl-form-row">
                                 <div class="nwl-form-field">
                                     <label for="parent_first_name"><?php esc_html_e('First Name', 'nursery-waiting-list'); ?> <span class="required">*</span></label>
-                                    <input type="text" id="parent_first_name" name="parent_first_name" 
+                                    <input type="text" id="parent_first_name" name="parent_first_name"
                                            value="<?php echo $is_edit ? esc_attr($entry->parent_first_name) : ''; ?>" required>
                                 </div>
                                 <div class="nwl-form-field">
                                     <label for="parent_last_name"><?php esc_html_e('Last Name', 'nursery-waiting-list'); ?> <span class="required">*</span></label>
-                                    <input type="text" id="parent_last_name" name="parent_last_name" 
+                                    <input type="text" id="parent_last_name" name="parent_last_name"
                                            value="<?php echo $is_edit ? esc_attr($entry->parent_last_name) : ''; ?>" required>
+                                </div>
+                            </div>
+
+                            <div class="nwl-form-row">
+                                <div class="nwl-form-field">
+                                    <label for="parent_dob"><?php esc_html_e('Date of Birth', 'nursery-waiting-list'); ?></label>
+                                    <input type="date" id="parent_dob" name="parent_dob"
+                                           value="<?php echo $is_edit ? esc_attr($entry->parent_dob) : ''; ?>">
+                                </div>
+                                <div class="nwl-form-field">
+                                    <label for="parent_national_insurance"><?php esc_html_e('National Insurance Number', 'nursery-waiting-list'); ?></label>
+                                    <input type="text" id="parent_national_insurance" name="parent_national_insurance"
+                                           value="<?php echo $is_edit ? esc_attr($entry->parent_national_insurance) : ''; ?>"
+                                           placeholder="<?php esc_attr_e('e.g. AB123456C', 'nursery-waiting-list'); ?>">
                                 </div>
                             </div>
 
@@ -358,9 +413,38 @@ class NWL_Admin_Entries {
                                            value="<?php echo $is_edit ? esc_attr($entry->parent_email) : ''; ?>" required>
                                 </div>
                                 <div class="nwl-form-field">
+                                    <label for="parent_phone"><?php esc_html_e('Phone Number', 'nursery-waiting-list'); ?></label>
+                                    <input type="tel" id="parent_phone" name="parent_phone"
+                                           value="<?php echo $is_edit ? esc_attr($entry->parent_phone) : ''; ?>">
+                                </div>
+                            </div>
+
+                            <div class="nwl-form-row">
+                                <div class="nwl-form-field">
                                     <label for="parent_mobile"><?php esc_html_e('Mobile', 'nursery-waiting-list'); ?></label>
                                     <input type="tel" id="parent_mobile" name="parent_mobile"
                                            value="<?php echo $is_edit ? esc_attr($entry->parent_mobile) : ''; ?>">
+                                </div>
+                                <div class="nwl-form-field">
+                                    <label for="relationship_to_child"><?php esc_html_e('Relationship to Child', 'nursery-waiting-list'); ?></label>
+                                    <input type="text" id="relationship_to_child" name="relationship_to_child"
+                                           value="<?php echo $is_edit ? esc_attr($entry->relationship_to_child) : ''; ?>"
+                                           placeholder="<?php esc_attr_e('e.g. Mother, Father, Guardian', 'nursery-waiting-list'); ?>">
+                                </div>
+                            </div>
+
+                            <div class="nwl-form-row">
+                                <div class="nwl-form-field">
+                                    <label for="parental_responsibility"><?php esc_html_e('Parental Responsibility', 'nursery-waiting-list'); ?></label>
+                                    <input type="text" id="parental_responsibility" name="parental_responsibility"
+                                           value="<?php echo $is_edit ? esc_attr($entry->parental_responsibility) : ''; ?>">
+                                </div>
+                                <div class="nwl-form-field">
+                                    <label for="declaration"><?php esc_html_e('Declaration', 'nursery-waiting-list'); ?></label>
+                                    <select id="declaration" name="declaration">
+                                        <option value="0" <?php selected($is_edit ? $entry->declaration : '', '0'); ?>><?php esc_html_e('No', 'nursery-waiting-list'); ?></option>
+                                        <option value="1" <?php selected($is_edit ? $entry->declaration : '', '1'); ?>><?php esc_html_e('Yes', 'nursery-waiting-list'); ?></option>
+                                    </select>
                                 </div>
                             </div>
 
@@ -769,34 +853,68 @@ class NWL_Admin_Entries {
      * AJAX: Save entry
      */
     public function ajax_save_entry() {
-        check_ajax_referer('nwl_save_entry', 'nwl_entry_nonce');
+        // Verify nonce
+        if (!check_ajax_referer('nwl_save_entry', 'nwl_entry_nonce', false)) {
+            wp_send_json_error(array('message' => __('Security check failed. Please refresh the page and try again.', 'nursery-waiting-list')));
+            return;
+        }
 
         if (!current_user_can('nwl_edit_entries')) {
             wp_send_json_error(array('message' => __('Permission denied.', 'nursery-waiting-list')));
+            return;
+        }
+
+        // Validate required fields
+        $required_fields = array('child_first_name', 'child_last_name', 'parent_first_name', 'parent_last_name', 'parent_email');
+        foreach ($required_fields as $field) {
+            if (empty($_POST[$field])) {
+                wp_send_json_error(array('message' => sprintf(__('The %s field is required.', 'nursery-waiting-list'), str_replace('_', ' ', $field))));
+                return;
+            }
+        }
+
+        // Validate email format
+        if (!is_email($_POST['parent_email'])) {
+            wp_send_json_error(array('message' => __('Please enter a valid email address.', 'nursery-waiting-list')));
+            return;
         }
 
         $entry_id = isset($_POST['entry_id']) ? absint($_POST['entry_id']) : 0;
-        
+
         $data = array(
-            'child_first_name' => sanitize_text_field($_POST['child_first_name']),
-            'child_last_name' => sanitize_text_field($_POST['child_last_name']),
-            'child_dob' => sanitize_text_field($_POST['child_dob']),
-            'child_gender' => sanitize_text_field($_POST['child_gender']),
-            'parent_first_name' => sanitize_text_field($_POST['parent_first_name']),
-            'parent_last_name' => sanitize_text_field($_POST['parent_last_name']),
-            'parent_email' => sanitize_email($_POST['parent_email']),
-            'parent_phone' => sanitize_text_field($_POST['parent_phone']),
-            'parent_mobile' => sanitize_text_field($_POST['parent_mobile']),
-            'parent_address_line1' => sanitize_text_field($_POST['parent_address_line1']),
-            'parent_address_line2' => sanitize_text_field($_POST['parent_address_line2']),
-            'parent_city' => sanitize_text_field($_POST['parent_city']),
-            'parent_postcode' => sanitize_text_field($_POST['parent_postcode']),
-            'age_group' => sanitize_text_field($_POST['age_group']),
-            'preferred_start_date' => sanitize_text_field($_POST['preferred_start_date']),
-            'days_required' => sanitize_text_field($_POST['days_required']),
-            'hours_per_week' => absint($_POST['hours_per_week']),
-            'internal_notes' => sanitize_textarea_field($_POST['internal_notes']),
-            'public_notes' => sanitize_textarea_field($_POST['public_notes']),
+            // Child Information
+            'child_first_name' => sanitize_text_field($_POST['child_first_name'] ?? ''),
+            'child_last_name' => sanitize_text_field($_POST['child_last_name'] ?? ''),
+            'child_dob' => sanitize_text_field($_POST['child_dob'] ?? ''),
+            'child_gender' => sanitize_text_field($_POST['child_gender'] ?? ''),
+            'child_place_of_birth_city' => sanitize_text_field($_POST['child_place_of_birth_city'] ?? ''),
+            'child_place_of_birth_country' => sanitize_text_field($_POST['child_place_of_birth_country'] ?? ''),
+            'child_first_language' => sanitize_text_field($_POST['child_first_language'] ?? ''),
+            'child_ethnicity' => sanitize_text_field($_POST['child_ethnicity'] ?? ''),
+            'child_attended_other_nursery' => absint($_POST['child_attended_other_nursery'] ?? 0),
+            'child_previous_nursery_name' => sanitize_text_field($_POST['child_previous_nursery_name'] ?? ''),
+            // Parent Information
+            'parent_first_name' => sanitize_text_field($_POST['parent_first_name'] ?? ''),
+            'parent_last_name' => sanitize_text_field($_POST['parent_last_name'] ?? ''),
+            'parent_dob' => sanitize_text_field($_POST['parent_dob'] ?? ''),
+            'parent_national_insurance' => sanitize_text_field($_POST['parent_national_insurance'] ?? ''),
+            'parent_email' => sanitize_email($_POST['parent_email'] ?? ''),
+            'parent_phone' => sanitize_text_field($_POST['parent_phone'] ?? ''),
+            'parent_mobile' => sanitize_text_field($_POST['parent_mobile'] ?? ''),
+            'parent_address_line1' => sanitize_text_field($_POST['parent_address_line1'] ?? ''),
+            'parent_city' => sanitize_text_field($_POST['parent_city'] ?? ''),
+            'parent_postcode' => sanitize_text_field($_POST['parent_postcode'] ?? ''),
+            'parental_responsibility' => sanitize_text_field($_POST['parental_responsibility'] ?? ''),
+            'relationship_to_child' => sanitize_text_field($_POST['relationship_to_child'] ?? ''),
+            'declaration' => absint($_POST['declaration'] ?? 0),
+            // Waiting List Details
+            'age_group' => sanitize_text_field($_POST['age_group'] ?? ''),
+            'preferred_start_date' => sanitize_text_field($_POST['preferred_start_date'] ?? ''),
+            'days_required' => sanitize_text_field($_POST['days_required'] ?? ''),
+            'hours_per_week' => absint($_POST['hours_per_week'] ?? 0),
+            // Notes
+            'internal_notes' => sanitize_textarea_field($_POST['internal_notes'] ?? ''),
+            'public_notes' => sanitize_textarea_field($_POST['public_notes'] ?? ''),
         );
 
         // Add status and priority if present
