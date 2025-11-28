@@ -720,8 +720,8 @@ class NWL_Database {
                                                 <td style="padding: 6px 0; color: #333; font-size: 13px; font-weight: 600;">{{parent_email}}</td>
                                             </tr>
                                             <tr>
-                                                <td style="padding: 6px 0; color: #666; font-size: 13px;">Phone:</td>
-                                                <td style="padding: 6px 0; color: #333; font-size: 13px; font-weight: 600;">{{parent_phone}}</td>
+                                                <td style="padding: 6px 0; color: #666; font-size: 13px;">Mobile:</td>
+                                                <td style="padding: 6px 0; color: #333; font-size: 13px; font-weight: 600;">{{parent_mobile}}</td>
                                             </tr>
                                         </table>
                                     </td>

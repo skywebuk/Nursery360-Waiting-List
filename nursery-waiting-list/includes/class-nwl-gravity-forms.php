@@ -105,9 +105,8 @@ class NWL_Gravity_Forms {
                     $data['parent2_last_name'] = $last;
                 }
             } elseif ($field && $field->type === 'address') {
-                // Address field
+                // Address field - map to 3 fields only (address, city, postcode)
                 $data['parent_address_line1'] = rgar($entry, $gf_field_id . '.1');
-                $data['parent_address_line2'] = rgar($entry, $gf_field_id . '.2');
                 $data['parent_city'] = rgar($entry, $gf_field_id . '.3');
                 $data['parent_postcode'] = rgar($entry, $gf_field_id . '.5');
             } elseif ($field && $field->type === 'date') {
@@ -256,9 +255,8 @@ class NWL_Gravity_Forms {
             __('Parent/Guardian Information', 'nursery-waiting-list') => array(
                 'parent_name' => __('Parent Name (Name field)', 'nursery-waiting-list'),
                 'parent_email' => __('Parent Email', 'nursery-waiting-list'),
-                'parent_phone' => __('Parent Phone', 'nursery-waiting-list'),
                 'parent_mobile' => __('Parent Mobile', 'nursery-waiting-list'),
-                'parent_address' => __('Parent Address (Address field)', 'nursery-waiting-list'),
+                'parent_address' => __('Parent Address (Address field - maps to Address, City, Postcode)', 'nursery-waiting-list'),
             ),
             __('Waiting List Details', 'nursery-waiting-list') => array(
                 'age_group' => __('Age Group', 'nursery-waiting-list'),
