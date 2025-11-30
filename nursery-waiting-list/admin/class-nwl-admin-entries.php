@@ -216,9 +216,6 @@ class NWL_Admin_Entries {
                                     <td>
                                         <?php echo esc_html($entry_handler->get_parent_name($entry)); ?>
                                         <br><small><a href="mailto:<?php echo esc_attr($entry->parent_email); ?>"><?php echo esc_html($entry->parent_email); ?></a></small>
-                                        <?php if ($entry->parent_mobile) : ?>
-                                            <br><small><?php echo esc_html($entry->parent_mobile); ?></small>
-                                        <?php endif; ?>
                                     </td>
                                     <td>
                                         <?php echo NWL_Admin::get_status_badge($entry->status); ?>
@@ -421,30 +418,28 @@ class NWL_Admin_Entries {
 
                             <div class="nwl-form-row">
                                 <div class="nwl-form-field">
-                                    <label for="parent_mobile"><?php esc_html_e('Mobile', 'nursery-waiting-list'); ?></label>
-                                    <input type="tel" id="parent_mobile" name="parent_mobile"
-                                           value="<?php echo $is_edit ? esc_attr($entry->parent_mobile) : ''; ?>">
-                                </div>
-                                <div class="nwl-form-field">
                                     <label for="relationship_to_child"><?php esc_html_e('Relationship to Child', 'nursery-waiting-list'); ?></label>
                                     <input type="text" id="relationship_to_child" name="relationship_to_child"
                                            value="<?php echo $is_edit ? esc_attr($entry->relationship_to_child) : ''; ?>"
                                            placeholder="<?php esc_attr_e('e.g. Mother, Father, Guardian', 'nursery-waiting-list'); ?>">
                                 </div>
-                            </div>
-
-                            <div class="nwl-form-row">
                                 <div class="nwl-form-field">
                                     <label for="parental_responsibility"><?php esc_html_e('Parental Responsibility', 'nursery-waiting-list'); ?></label>
                                     <input type="text" id="parental_responsibility" name="parental_responsibility"
                                            value="<?php echo $is_edit ? esc_attr($entry->parental_responsibility) : ''; ?>">
                                 </div>
+                            </div>
+
+                            <div class="nwl-form-row">
                                 <div class="nwl-form-field">
                                     <label for="declaration"><?php esc_html_e('Declaration', 'nursery-waiting-list'); ?></label>
                                     <select id="declaration" name="declaration">
                                         <option value="0" <?php selected($is_edit ? $entry->declaration : '', '0'); ?>><?php esc_html_e('No', 'nursery-waiting-list'); ?></option>
                                         <option value="1" <?php selected($is_edit ? $entry->declaration : '', '1'); ?>><?php esc_html_e('Yes', 'nursery-waiting-list'); ?></option>
                                     </select>
+                                </div>
+                                <div class="nwl-form-field">
+                                    <!-- Empty for alignment -->
                                 </div>
                             </div>
 
@@ -503,20 +498,9 @@ class NWL_Admin_Entries {
                                            placeholder="<?php esc_attr_e('e.g. Monday, Wednesday, Friday', 'nursery-waiting-list'); ?>">
                                 </div>
                                 <div class="nwl-form-field">
-                                    <label for="hours_per_week"><?php esc_html_e('Hours Per Week', 'nursery-waiting-list'); ?></label>
-                                    <input type="number" id="hours_per_week" name="hours_per_week"
-                                           value="<?php echo $is_edit ? esc_attr($entry->hours_per_week) : ''; ?>">
-                                </div>
-                            </div>
-
-                            <div class="nwl-form-row">
-                                <div class="nwl-form-field">
                                     <label for="share_code"><?php esc_html_e('Share Code', 'nursery-waiting-list'); ?></label>
                                     <input type="text" id="share_code" name="share_code"
                                            value="<?php echo $is_edit ? esc_attr($entry->share_code) : ''; ?>">
-                                </div>
-                                <div class="nwl-form-field">
-                                    <!-- Empty for alignment -->
                                 </div>
                             </div>
                         </div>
@@ -912,7 +896,6 @@ class NWL_Admin_Entries {
             'parent_national_insurance' => sanitize_text_field($_POST['parent_national_insurance'] ?? ''),
             'parent_email' => sanitize_email($_POST['parent_email'] ?? ''),
             'parent_phone' => sanitize_text_field($_POST['parent_phone'] ?? ''),
-            'parent_mobile' => sanitize_text_field($_POST['parent_mobile'] ?? ''),
             'parent_address_line1' => sanitize_text_field($_POST['parent_address_line1'] ?? ''),
             'parent_city' => sanitize_text_field($_POST['parent_city'] ?? ''),
             'parent_postcode' => sanitize_text_field($_POST['parent_postcode'] ?? ''),
@@ -923,7 +906,6 @@ class NWL_Admin_Entries {
             'age_group' => sanitize_text_field($_POST['age_group'] ?? ''),
             'preferred_start_date' => sanitize_text_field($_POST['preferred_start_date'] ?? ''),
             'days_required' => sanitize_text_field($_POST['days_required'] ?? ''),
-            'hours_per_week' => absint($_POST['hours_per_week'] ?? 0),
             'share_code' => sanitize_text_field($_POST['share_code'] ?? ''),
             // Notes
             'internal_notes' => sanitize_textarea_field($_POST['internal_notes'] ?? ''),

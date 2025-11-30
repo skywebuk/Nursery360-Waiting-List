@@ -332,7 +332,6 @@ class NWL_Gravity_Forms {
             ),
             __('Waiting List Details', 'nursery-waiting-list') => array(
                 'sessions_required' => __('Sessions Required', 'nursery-waiting-list'),
-                'hours_per_week' => __('Hours Per Week', 'nursery-waiting-list'),
             ),
         );
     }
