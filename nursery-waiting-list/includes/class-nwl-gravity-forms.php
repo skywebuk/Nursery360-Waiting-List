@@ -105,10 +105,17 @@ class NWL_Gravity_Forms {
                     $data['parent2_last_name'] = $last;
                 }
             } elseif ($field && $field->type === 'address') {
-                // Address field - map to 3 fields only (address, city, postcode)
-                $data['parent_address_line1'] = rgar($entry, $gf_field_id . '.1');
-                $data['parent_city'] = rgar($entry, $gf_field_id . '.3');
-                $data['parent_postcode'] = rgar($entry, $gf_field_id . '.5');
+                // Handle different address field mappings
+                if ($wl_field === 'child_place_of_birth') {
+                    // Child place of birth - map city and country from address field
+                    $data['child_place_of_birth_city'] = rgar($entry, $gf_field_id . '.3');
+                    $data['child_place_of_birth_country'] = rgar($entry, $gf_field_id . '.6');
+                } else {
+                    // Parent address field - map to 3 fields only (address, city, postcode)
+                    $data['parent_address_line1'] = rgar($entry, $gf_field_id . '.1');
+                    $data['parent_city'] = rgar($entry, $gf_field_id . '.3');
+                    $data['parent_postcode'] = rgar($entry, $gf_field_id . '.5');
+                }
             } elseif ($field && $field->type === 'date') {
                 // Date field - convert to MySQL format
                 $date_value = rgar($entry, $gf_field_id);
@@ -271,13 +278,12 @@ class NWL_Gravity_Forms {
             __('Child Information', 'nursery-waiting-list') => array(
                 'child_name' => __('Child Name (Name field)', 'nursery-waiting-list'),
                 'child_dob' => __('Child Date of Birth', 'nursery-waiting-list'),
-                'child_place_of_birth_city' => __('Child Place of Birth (City)', 'nursery-waiting-list'),
-                'child_place_of_birth_country' => __('Child Place of Birth (Country)', 'nursery-waiting-list'),
+                'child_place_of_birth' => __('Child Place of Birth (Address field - maps to City & Country)', 'nursery-waiting-list'),
                 'child_first_language' => __('Child First Language', 'nursery-waiting-list'),
                 'child_ethnicity' => __('Ethnicity', 'nursery-waiting-list'),
                 'child_gender' => __('Child Gender', 'nursery-waiting-list'),
                 'child_attended_other_nursery' => __('Has your child attended another nursery?', 'nursery-waiting-list'),
-                'child_previous_nursery_name' => __('Enter name of nursery', 'nursery-waiting-list'),
+                'child_previous_nursery_name' => __('Enter name of nursery (shown if Yes above)', 'nursery-waiting-list'),
                 'preferred_start_date' => __('What date would you like to start?', 'nursery-waiting-list'),
                 'days_required' => __('Please select your preferred days', 'nursery-waiting-list'),
             ),
@@ -287,7 +293,6 @@ class NWL_Gravity_Forms {
                 'parent_national_insurance' => __('Parent National Insurance Number', 'nursery-waiting-list'),
                 'parent_email' => __('Parent Email', 'nursery-waiting-list'),
                 'parent_phone' => __('Parent Phone Number', 'nursery-waiting-list'),
-                'parent_mobile' => __('Parent Mobile', 'nursery-waiting-list'),
                 'parent_address' => __('Parent Address (Address field - maps to Address, City, Postcode)', 'nursery-waiting-list'),
                 'parental_responsibility' => __('Parental Responsibility', 'nursery-waiting-list'),
                 'relationship_to_child' => __('Relationship to Child', 'nursery-waiting-list'),
