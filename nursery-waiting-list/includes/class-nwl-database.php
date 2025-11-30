@@ -67,6 +67,7 @@ class NWL_Database {
             parent_last_name varchar(100) NOT NULL,
             parent_dob date DEFAULT NULL,
             parent_national_insurance varchar(20) DEFAULT NULL,
+            share_code varchar(50) DEFAULT NULL,
             parent_email varchar(255) NOT NULL,
             parent_phone varchar(50) DEFAULT NULL,
             parent_mobile varchar(50) DEFAULT NULL,
