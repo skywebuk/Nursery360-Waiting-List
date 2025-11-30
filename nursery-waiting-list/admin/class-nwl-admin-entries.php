@@ -486,6 +486,7 @@ class NWL_Admin_Entries {
                                             </option>
                                         <?php endforeach; ?>
                                     </select>
+                                    <p class="description"><?php esc_html_e('Auto-calculated from child\'s date of birth on form submission.', 'nursery-waiting-list'); ?></p>
                                 </div>
                                 <div class="nwl-form-field">
                                     <label for="preferred_start_date"><?php esc_html_e('Preferred Start Date', 'nursery-waiting-list'); ?></label>
@@ -505,6 +506,17 @@ class NWL_Admin_Entries {
                                     <label for="hours_per_week"><?php esc_html_e('Hours Per Week', 'nursery-waiting-list'); ?></label>
                                     <input type="number" id="hours_per_week" name="hours_per_week"
                                            value="<?php echo $is_edit ? esc_attr($entry->hours_per_week) : ''; ?>">
+                                </div>
+                            </div>
+
+                            <div class="nwl-form-row">
+                                <div class="nwl-form-field">
+                                    <label for="share_code"><?php esc_html_e('Share Code', 'nursery-waiting-list'); ?></label>
+                                    <input type="text" id="share_code" name="share_code"
+                                           value="<?php echo $is_edit ? esc_attr($entry->share_code) : ''; ?>">
+                                </div>
+                                <div class="nwl-form-field">
+                                    <!-- Empty for alignment -->
                                 </div>
                             </div>
                         </div>
@@ -912,6 +924,7 @@ class NWL_Admin_Entries {
             'preferred_start_date' => sanitize_text_field($_POST['preferred_start_date'] ?? ''),
             'days_required' => sanitize_text_field($_POST['days_required'] ?? ''),
             'hours_per_week' => absint($_POST['hours_per_week'] ?? 0),
+            'share_code' => sanitize_text_field($_POST['share_code'] ?? ''),
             // Notes
             'internal_notes' => sanitize_textarea_field($_POST['internal_notes'] ?? ''),
             'public_notes' => sanitize_textarea_field($_POST['public_notes'] ?? ''),
