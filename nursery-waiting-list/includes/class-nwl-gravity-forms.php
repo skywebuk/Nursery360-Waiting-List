@@ -159,8 +159,39 @@ class NWL_Gravity_Forms {
             }
         }
 
+        // Auto-calculate age group from child's date of birth
+        if (!empty($data['child_dob'])) {
+            $data['age_group'] = $this->calculate_age_group($data['child_dob']);
+        }
+
         // Apply filters for custom mapping
         return apply_filters('nwl_gravity_forms_mapped_data', $data, $entry, $form, $settings);
+    }
+
+    /**
+     * Calculate age group based on child's date of birth
+     * Uses UK Early Years Foundation Stage (EYFS) aligned age groups
+     */
+    private function calculate_age_group($dob) {
+        $birth_date = new DateTime($dob);
+        $today = new DateTime();
+        $age = $birth_date->diff($today);
+
+        $years = $age->y;
+        $months = $age->m;
+        $total_months = ($years * 12) + $months;
+
+        if ($total_months < 12) {
+            return '0-12m'; // Under 1 year
+        } elseif ($years >= 1 && $years < 2) {
+            return '1-2y'; // 1-2 years
+        } elseif ($years >= 2 && $years < 3) {
+            return '2-3y'; // 2-3 years
+        } elseif ($years >= 3 && $years < 4) {
+            return '3-4y'; // 3-4 years (Pre-School)
+        } else {
+            return '4-5y'; // 4-5 years (Reception Ready)
+        }
     }
 
     /**
@@ -291,6 +322,7 @@ class NWL_Gravity_Forms {
                 'parent_name' => __('Parent Name (Name field)', 'nursery-waiting-list'),
                 'parent_dob' => __('Parent Date of Birth', 'nursery-waiting-list'),
                 'parent_national_insurance' => __('Parent National Insurance Number', 'nursery-waiting-list'),
+                'share_code' => __('Share Code', 'nursery-waiting-list'),
                 'parent_email' => __('Parent Email', 'nursery-waiting-list'),
                 'parent_phone' => __('Parent Phone Number', 'nursery-waiting-list'),
                 'parent_address' => __('Parent Address (Address field - maps to Address, City, Postcode)', 'nursery-waiting-list'),
@@ -299,7 +331,6 @@ class NWL_Gravity_Forms {
                 'declaration' => __('Declaration', 'nursery-waiting-list'),
             ),
             __('Waiting List Details', 'nursery-waiting-list') => array(
-                'age_group' => __('Age Group', 'nursery-waiting-list'),
                 'sessions_required' => __('Sessions Required', 'nursery-waiting-list'),
                 'hours_per_week' => __('Hours Per Week', 'nursery-waiting-list'),
             ),

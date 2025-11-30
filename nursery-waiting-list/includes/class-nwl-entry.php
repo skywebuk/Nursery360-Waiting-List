@@ -397,9 +397,13 @@ class NWL_Entry {
 
         $text_fields = array(
             'child_first_name', 'child_last_name', 'child_gender',
+            'child_place_of_birth_city', 'child_place_of_birth_country',
+            'child_first_language', 'child_ethnicity', 'child_previous_nursery_name',
             'parent_first_name', 'parent_last_name',
             'parent_phone', 'parent_mobile', 'parent_address_line1',
             'parent_address_line2', 'parent_city', 'parent_postcode',
+            'parent_national_insurance', 'share_code',
+            'parental_responsibility', 'relationship_to_child',
             'age_group', 'days_required', 'sessions_required',
             'status', 'priority', 'offer_response',
             'waiting_list_number'
@@ -409,7 +413,17 @@ class NWL_Entry {
             'internal_notes', 'public_notes'
         );
 
-        $int_fields = array('hours_per_week', 'created_by', 'updated_by');
+        $int_fields = array(
+            'hours_per_week', 'created_by', 'updated_by',
+            'gravity_form_id', 'gravity_entry_id',
+            'child_attended_other_nursery', 'declaration',
+            'consent_given', 'deletion_requested'
+        );
+
+        $date_fields = array(
+            'child_dob', 'parent_dob', 'preferred_start_date',
+            'offer_deadline', 'data_retention_date'
+        );
 
         foreach ($data as $key => $value) {
             if (in_array($key, $email_fields)) {
@@ -420,6 +434,9 @@ class NWL_Entry {
                 $data[$key] = sanitize_textarea_field($value);
             } elseif (in_array($key, $int_fields)) {
                 $data[$key] = absint($value);
+            } elseif (in_array($key, $date_fields)) {
+                // Sanitize date fields - ensure valid date format or empty
+                $data[$key] = !empty($value) ? sanitize_text_field($value) : null;
             }
         }
 

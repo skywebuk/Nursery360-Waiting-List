@@ -79,8 +79,8 @@
 }
 
 .nwl-type-btn.active {
-    background: #4A90A4;
-    border-color: #4A90A4;
+    background: #0d78be;
+    border-color: #0d78be;
     color: #fff;
 }
 
@@ -101,7 +101,7 @@
 
 .nwl-input:focus {
     outline: none;
-    border-color: #4A90A4;
+    border-color: #0d78be;
     box-shadow: 0 0 0 3px rgba(74, 144, 164, 0.15);
 }
 
@@ -116,7 +116,7 @@
     font-size: 16px;
     font-weight: 600;
     color: #fff;
-    background: linear-gradient(135deg, #4A90A4 0%, #3a7a8f 100%);
+    background: linear-gradient(135deg, #0d78be 0%, #0a5f96 100%);
     border: none;
     border-radius: 8px;
     cursor: pointer;
@@ -317,16 +317,16 @@
     padding: 12px 30px;
     font-size: 14px;
     font-weight: 500;
-    color: #4A90A4;
+    color: #0d78be;
     background: #fff;
-    border: 2px solid #4A90A4;
+    border: 2px solid #0d78be;
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .nwl-new-search-btn:hover {
-    background: #4A90A4;
+    background: #0d78be;
     color: #fff;
 }
 
@@ -433,7 +433,7 @@
 .nwl-lookup-container button:focus,
 .nwl-lookup-container input:focus,
 .nwl-lookup-container select:focus {
-    outline: 3px solid #4A90A4;
+    outline: 3px solid #0d78be;
     outline-offset: 2px;
     box-shadow: 0 0 0 4px rgba(74, 144, 164, 0.2);
 }
@@ -443,7 +443,7 @@
     position: absolute;
     top: -40px;
     left: 0;
-    background: #4A90A4;
+    background: #0d78be;
     color: #fff;
     padding: 8px 16px;
     z-index: 100001;
@@ -514,7 +514,7 @@
 
 /* Better focus visible for form elements */
 .nwl-type-btn:focus-visible {
-    outline: 3px solid #4A90A4;
+    outline: 3px solid #0d78be;
     outline-offset: 2px;
 }
 
