@@ -29,8 +29,60 @@ class NWL_Database {
         $installed_version = get_option('nwl_db_version', '0');
         if (version_compare($installed_version, NWL_VERSION, '<')) {
             self::create_tables();
+            self::add_missing_columns(); // Ensure all columns exist
             self::insert_default_templates(); // Update system templates
             update_option('nwl_db_version', NWL_VERSION);
+        }
+
+        // Always check for missing columns on every load (lightweight check)
+        self::add_missing_columns();
+    }
+
+    /**
+     * Add missing columns to existing tables
+     * This ensures database schema is always up to date
+     */
+    public static function add_missing_columns() {
+        global $wpdb;
+
+        $table = $wpdb->prefix . NWL_TABLE_ENTRIES;
+
+        // Check if table exists first
+        $table_exists = $wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $table));
+        if (!$table_exists) {
+            return; // Table doesn't exist, will be created by create_tables()
+        }
+
+        // Get existing columns
+        $existing_columns = array();
+        $columns = $wpdb->get_results("SHOW COLUMNS FROM $table");
+        foreach ($columns as $column) {
+            $existing_columns[] = $column->Field;
+        }
+
+        // Define columns that should exist with their SQL definitions
+        $required_columns = array(
+            'share_code' => "ALTER TABLE $table ADD COLUMN share_code varchar(50) DEFAULT NULL AFTER parent_national_insurance",
+            'child_place_of_birth_city' => "ALTER TABLE $table ADD COLUMN child_place_of_birth_city varchar(100) DEFAULT NULL AFTER child_dob",
+            'child_place_of_birth_country' => "ALTER TABLE $table ADD COLUMN child_place_of_birth_country varchar(100) DEFAULT NULL AFTER child_place_of_birth_city",
+            'child_first_language' => "ALTER TABLE $table ADD COLUMN child_first_language varchar(100) DEFAULT NULL AFTER child_place_of_birth_country",
+            'child_ethnicity' => "ALTER TABLE $table ADD COLUMN child_ethnicity varchar(100) DEFAULT NULL AFTER child_first_language",
+            'child_gender' => "ALTER TABLE $table ADD COLUMN child_gender varchar(20) DEFAULT NULL AFTER child_ethnicity",
+            'child_attended_other_nursery' => "ALTER TABLE $table ADD COLUMN child_attended_other_nursery tinyint(1) DEFAULT 0 AFTER child_gender",
+            'child_previous_nursery_name' => "ALTER TABLE $table ADD COLUMN child_previous_nursery_name varchar(255) DEFAULT NULL AFTER child_attended_other_nursery",
+            'parent_dob' => "ALTER TABLE $table ADD COLUMN parent_dob date DEFAULT NULL AFTER parent_last_name",
+            'parent_national_insurance' => "ALTER TABLE $table ADD COLUMN parent_national_insurance varchar(20) DEFAULT NULL AFTER parent_dob",
+            'parental_responsibility' => "ALTER TABLE $table ADD COLUMN parental_responsibility varchar(100) DEFAULT NULL AFTER parent_postcode",
+            'relationship_to_child' => "ALTER TABLE $table ADD COLUMN relationship_to_child varchar(100) DEFAULT NULL AFTER parental_responsibility",
+            'declaration' => "ALTER TABLE $table ADD COLUMN declaration tinyint(1) DEFAULT 0 AFTER relationship_to_child",
+            'sessions_required' => "ALTER TABLE $table ADD COLUMN sessions_required varchar(255) DEFAULT NULL AFTER days_required",
+        );
+
+        // Add any missing columns
+        foreach ($required_columns as $column_name => $alter_sql) {
+            if (!in_array($column_name, $existing_columns)) {
+                $wpdb->query($alter_sql);
+            }
         }
     }
 
