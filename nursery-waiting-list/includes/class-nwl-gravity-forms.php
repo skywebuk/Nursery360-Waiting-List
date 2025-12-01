@@ -119,8 +119,24 @@ class NWL_Gravity_Forms {
             } elseif ($field && $field->type === 'date') {
                 // Date field - convert to MySQL format
                 $date_value = rgar($entry, $gf_field_id);
+
+                // Handle dropdown-style date fields (stored in subfields .1=month, .2=day, .3=year)
+                if (empty($date_value)) {
+                    $month = rgar($entry, $gf_field_id . '.1');
+                    $day = rgar($entry, $gf_field_id . '.2');
+                    $year = rgar($entry, $gf_field_id . '.3');
+
+                    if ($month && $day && $year) {
+                        // Construct date from dropdown parts
+                        $date_value = sprintf('%04d-%02d-%02d', intval($year), intval($month), intval($day));
+                    }
+                }
+
                 if ($date_value) {
-                    $data[$wl_field] = date('Y-m-d', strtotime($date_value));
+                    $parsed_date = strtotime($date_value);
+                    if ($parsed_date !== false) {
+                        $data[$wl_field] = date('Y-m-d', $parsed_date);
+                    }
                 }
             } elseif ($field && $field->type === 'checkbox') {
                 // Checkbox field - get all selected values
