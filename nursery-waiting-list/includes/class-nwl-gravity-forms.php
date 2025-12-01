@@ -86,8 +86,11 @@ class NWL_Gravity_Forms {
                 continue;
             }
 
+            // Ensure field ID is integer for GFAPI lookup
+            $gf_field_id_int = absint($gf_field_id);
+
             // Handle name fields (which can have subfields)
-            $field = GFAPI::get_field($form, $gf_field_id);
+            $field = GFAPI::get_field($form, $gf_field_id_int);
             
             if ($field && $field->type === 'name') {
                 // Name field - get first and last name
@@ -118,25 +121,9 @@ class NWL_Gravity_Forms {
                 }
             } elseif ($field && $field->type === 'date') {
                 // Date field - convert to MySQL format
-                $date_value = rgar($entry, $gf_field_id);
-
-                // Handle dropdown-style date fields (stored in subfields .1=month, .2=day, .3=year)
-                if (empty($date_value)) {
-                    $month = rgar($entry, $gf_field_id . '.1');
-                    $day = rgar($entry, $gf_field_id . '.2');
-                    $year = rgar($entry, $gf_field_id . '.3');
-
-                    if ($month && $day && $year) {
-                        // Construct date from dropdown parts
-                        $date_value = sprintf('%04d-%02d-%02d', intval($year), intval($month), intval($day));
-                    }
-                }
-
+                $date_value = rgar($entry, $gf_field_id_int);
                 if ($date_value) {
-                    $parsed_date = strtotime($date_value);
-                    if ($parsed_date !== false) {
-                        $data[$wl_field] = date('Y-m-d', $parsed_date);
-                    }
+                    $data[$wl_field] = date('Y-m-d', strtotime($date_value));
                 }
             } elseif ($field && $field->type === 'checkbox') {
                 // Checkbox field - get all selected values
@@ -155,16 +142,20 @@ class NWL_Gravity_Forms {
                 }
             } elseif ($field && $field->type === 'radio') {
                 // Radio field - handle Yes/No type answers for boolean fields
-                $value = rgar($entry, $gf_field_id);
+                $value = rgar($entry, $gf_field_id_int);
                 if (in_array($wl_field, array('child_attended_other_nursery', 'declaration'))) {
                     $yes_values = array('yes', 'true', '1', 'oui');
                     $data[$wl_field] = in_array(strtolower($value), $yes_values) ? 1 : 0;
                 } else {
                     $data[$wl_field] = $value;
                 }
+            } elseif ($field && $field->type === 'select') {
+                // Select/dropdown field - get selected value directly
+                $value = rgar($entry, $gf_field_id_int);
+                $data[$wl_field] = $value;
             } else {
-                // Standard field
-                $value = rgar($entry, $gf_field_id);
+                // Standard field (text, number, etc.) or field not found
+                $value = rgar($entry, $gf_field_id_int);
                 // Handle boolean fields that might come from text/select
                 if (in_array($wl_field, array('child_attended_other_nursery', 'declaration'))) {
                     $yes_values = array('yes', 'true', '1', 'oui');
