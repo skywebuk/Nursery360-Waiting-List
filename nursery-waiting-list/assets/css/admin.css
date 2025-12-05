@@ -1975,3 +1975,293 @@ select option.nwl-option-full {
         content: none; /* Don't show URLs as they're not useful in print */
     }
 }
+
+/* ==========================================================================
+   Email Template Editor Styles
+   ========================================================================== */
+
+.nwl-template-form-improved {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.nwl-template-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 25px;
+    border-bottom: 1px solid #e5e7eb;
+    background: #f8fafc;
+    border-radius: 8px 8px 0 0;
+}
+
+.nwl-template-title-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
+.nwl-template-title-input {
+    font-size: 18px !important;
+    font-weight: 600 !important;
+    padding: 8px 12px !important;
+    border: 2px solid transparent !important;
+    background: transparent !important;
+    border-radius: 6px !important;
+    min-width: 300px;
+    transition: all 0.2s;
+}
+
+.nwl-template-title-input:focus {
+    border-color: #4A90A4 !important;
+    background: #fff !important;
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(74, 144, 164, 0.15) !important;
+}
+
+.nwl-toggle-switch {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.nwl-toggle-switch input {
+    display: none;
+}
+
+.nwl-toggle-slider {
+    width: 44px;
+    height: 24px;
+    background: #cbd5e1;
+    border-radius: 12px;
+    position: relative;
+    transition: background 0.2s;
+}
+
+.nwl-toggle-slider::after {
+    content: '';
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    background: #fff;
+    border-radius: 50%;
+    top: 3px;
+    left: 3px;
+    transition: transform 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.nwl-toggle-switch input:checked + .nwl-toggle-slider {
+    background: #28a745;
+}
+
+.nwl-toggle-switch input:checked + .nwl-toggle-slider::after {
+    transform: translateX(20px);
+}
+
+.nwl-toggle-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #475569;
+}
+
+.nwl-template-settings-row {
+    padding: 15px 25px;
+    background: #f8fafc;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.nwl-template-setting {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.nwl-template-setting label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #475569;
+}
+
+.nwl-template-setting select {
+    min-width: 200px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+}
+
+.nwl-template-subject-section {
+    padding: 20px 25px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.nwl-template-subject-section label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 8px;
+}
+
+.nwl-subject-input-wrap {
+    display: flex;
+    gap: 10px;
+}
+
+.nwl-subject-input {
+    flex: 1;
+    padding: 10px 14px !important;
+    font-size: 15px !important;
+    border: 1px solid #d1d5db !important;
+    border-radius: 6px !important;
+}
+
+.nwl-subject-input:focus {
+    border-color: #4A90A4 !important;
+    box-shadow: 0 0 0 3px rgba(74, 144, 164, 0.15) !important;
+    outline: none !important;
+}
+
+.nwl-insert-var-btn {
+    white-space: nowrap;
+}
+
+.nwl-template-body-section {
+    padding: 20px 25px;
+}
+
+.nwl-body-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.nwl-body-header label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.nwl-template-attachments-section {
+    padding: 20px 25px;
+    background: #f8fafc;
+    border-top: 1px solid #e5e7eb;
+}
+
+.nwl-template-attachments-section h4 {
+    margin: 0 0 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.nwl-attachments-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.nwl-attachment-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: #fff;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 13px;
+}
+
+.nwl-attachment-item .dashicons {
+    color: #4A90A4;
+}
+
+.nwl-attachment-name {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.nwl-remove-attachment {
+    background: none;
+    border: none;
+    color: #dc2626;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+    padding: 0 4px;
+}
+
+.nwl-remove-attachment:hover {
+    color: #b91c1c;
+}
+
+.nwl-add-attachment {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.nwl-add-attachment .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+}
+
+.nwl-template-form-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 25px;
+    background: #f8fafc;
+    border-top: 1px solid #e5e7eb;
+    border-radius: 0 0 8px 8px;
+}
+
+.nwl-actions-left,
+.nwl-actions-right {
+    display: flex;
+    gap: 10px;
+}
+
+.nwl-actions-right .button-primary {
+    padding: 8px 24px !important;
+}
+
+/* Variable dropdown */
+.nwl-var-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: #fff;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+    min-width: 200px;
+}
+
+.nwl-var-dropdown-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.nwl-var-dropdown-item:hover {
+    background: #f0f9ff;
+}
+
+.nwl-var-dropdown-item code {
+    background: #e5e7eb;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 12px;
+}

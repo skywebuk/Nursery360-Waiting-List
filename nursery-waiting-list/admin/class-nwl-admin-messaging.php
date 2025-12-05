@@ -436,9 +436,9 @@ class NWL_Admin_Messaging {
                 $args['priority'] = isset($_POST['filter_priority']) ? sanitize_text_field($_POST['filter_priority']) : '';
             }
             
-            // Exclude removed entries
+            // Exclude withdrawn entries
             if (empty($args['status'])) {
-                $args['status'] = array('pending', 'contacted', 'waitlisted', 'offered', 'accepted', 'enrolled');
+                $args['status'] = array('pending', 'waitlisted', 'offered', 'enrolled');
             }
             
             $result = $entry_handler->get_entries($args);
@@ -535,9 +535,9 @@ class NWL_Admin_Messaging {
             'page' => 1,
         );
 
-        // Exclude removed entries if no status filter
+        // Exclude withdrawn entries if no status filter
         if (empty($args['status'])) {
-            $args['status'] = array('pending', 'contacted', 'waitlisted', 'offered', 'accepted', 'enrolled');
+            $args['status'] = array('pending', 'waitlisted', 'offered', 'enrolled');
         }
 
         $result = NWL_Entry::get_instance()->get_entries($args);

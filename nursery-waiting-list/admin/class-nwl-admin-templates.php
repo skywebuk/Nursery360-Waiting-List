@@ -81,69 +81,128 @@ class NWL_Admin_Templates {
                 <!-- Template Editor -->
                 <div class="nwl-template-editor">
                     <?php if ($editing && $current_template) : ?>
-                        <h3><?php printf(esc_html__('Edit: %s', 'nursery-waiting-list'), esc_html($current_template->template_name)); ?></h3>
-                        
-                        <form id="nwl-template-form" method="post">
+                        <?php
+                        $current_attachments = !empty($current_template->attachments) ? json_decode($current_template->attachments, true) : array();
+                        if (!is_array($current_attachments)) $current_attachments = array();
+                        ?>
+                        <form id="nwl-template-form" method="post" class="nwl-template-form-improved">
                             <?php wp_nonce_field('nwl_save_template', 'nwl_template_nonce'); ?>
                             <input type="hidden" name="template_id" value="<?php echo esc_attr($current_template->id); ?>">
-                            
-                            <table class="form-table">
-                                <tr>
-                                    <th scope="row">
-                                        <label for="template_name"><?php esc_html_e('Template Name', 'nursery-waiting-list'); ?></label>
-                                    </th>
-                                    <td>
-                                        <input type="text" id="template_name" name="template_name" 
-                                               value="<?php echo esc_attr($current_template->template_name); ?>" 
-                                               class="regular-text" required>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">
-                                        <label for="subject"><?php esc_html_e('Email Subject', 'nursery-waiting-list'); ?></label>
-                                    </th>
-                                    <td>
-                                        <input type="text" id="subject" name="subject" 
-                                               value="<?php echo esc_attr($current_template->subject); ?>" 
-                                               class="large-text" required>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">
-                                        <label for="body"><?php esc_html_e('Email Body', 'nursery-waiting-list'); ?></label>
-                                    </th>
-                                    <td>
-                                        <?php 
-                                        wp_editor($current_template->body, 'body', array(
-                                            'textarea_name' => 'body',
-                                            'textarea_rows' => 20,
-                                            'media_buttons' => false,
-                                            'teeny' => false,
-                                            'quicktags' => true,
-                                        )); 
-                                        ?>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th scope="row"><?php esc_html_e('Status', 'nursery-waiting-list'); ?></th>
-                                    <td>
-                                        <label>
-                                            <input type="checkbox" name="is_active" value="1" <?php checked($current_template->is_active); ?>>
-                                            <?php esc_html_e('Active', 'nursery-waiting-list'); ?>
-                                        </label>
-                                    </td>
-                                </tr>
-                            </table>
 
-                            <p class="submit">
-                                <button type="submit" class="button button-primary"><?php esc_html_e('Save Template', 'nursery-waiting-list'); ?></button>
-                                <button type="button" class="button nwl-preview-template"><?php esc_html_e('Preview', 'nursery-waiting-list'); ?></button>
-                                <?php if (!$current_template->is_system) : ?>
-                                    <button type="button" class="button button-link-delete nwl-delete-template" data-id="<?php echo esc_attr($current_template->id); ?>">
-                                        <?php esc_html_e('Delete Template', 'nursery-waiting-list'); ?>
+                            <!-- Template Header -->
+                            <div class="nwl-template-header">
+                                <div class="nwl-template-title-section">
+                                    <input type="text" id="template_name" name="template_name"
+                                           value="<?php echo esc_attr($current_template->template_name); ?>"
+                                           class="nwl-template-title-input" required
+                                           placeholder="<?php esc_attr_e('Template Name', 'nursery-waiting-list'); ?>">
+                                    <?php if ($current_template->is_system) : ?>
+                                        <span class="nwl-badge nwl-badge-info"><?php esc_html_e('System', 'nursery-waiting-list'); ?></span>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="nwl-template-actions-top">
+                                    <label class="nwl-toggle-switch">
+                                        <input type="checkbox" name="is_active" value="1" <?php checked($current_template->is_active); ?>>
+                                        <span class="nwl-toggle-slider"></span>
+                                        <span class="nwl-toggle-label"><?php esc_html_e('Active', 'nursery-waiting-list'); ?></span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Settings Row -->
+                            <div class="nwl-template-settings-row">
+                                <div class="nwl-template-setting">
+                                    <label for="status_trigger"><?php esc_html_e('Auto-send when status changes to:', 'nursery-waiting-list'); ?></label>
+                                    <select id="status_trigger" name="status_trigger">
+                                        <option value=""><?php esc_html_e('— Manual send only —', 'nursery-waiting-list'); ?></option>
+                                        <?php foreach (NWL_Database::get_statuses() as $key => $label) : ?>
+                                            <option value="<?php echo esc_attr($key); ?>" <?php selected(isset($current_template->status_trigger) ? $current_template->status_trigger : '', $key); ?>>
+                                                <?php echo esc_html($label); ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Subject Line -->
+                            <div class="nwl-template-subject-section">
+                                <label for="subject"><?php esc_html_e('Subject Line', 'nursery-waiting-list'); ?></label>
+                                <div class="nwl-subject-input-wrap">
+                                    <input type="text" id="subject" name="subject"
+                                           value="<?php echo esc_attr($current_template->subject); ?>"
+                                           class="nwl-subject-input" required
+                                           placeholder="<?php esc_attr_e('Enter email subject...', 'nursery-waiting-list'); ?>">
+                                    <button type="button" class="button nwl-insert-var-btn" data-target="subject">
+                                        <?php esc_html_e('+ Variable', 'nursery-waiting-list'); ?>
                                     </button>
-                                <?php endif; ?>
-                            </p>
+                                </div>
+                            </div>
+
+                            <!-- Email Body Editor -->
+                            <div class="nwl-template-body-section">
+                                <div class="nwl-body-header">
+                                    <label for="body"><?php esc_html_e('Email Content', 'nursery-waiting-list'); ?></label>
+                                    <div class="nwl-body-tools">
+                                        <button type="button" class="button nwl-insert-var-btn" data-target="body">
+                                            <?php esc_html_e('+ Insert Variable', 'nursery-waiting-list'); ?>
+                                        </button>
+                                    </div>
+                                </div>
+                                <?php
+                                wp_editor($current_template->body, 'body', array(
+                                    'textarea_name' => 'body',
+                                    'textarea_rows' => 25,
+                                    'media_buttons' => true,
+                                    'teeny' => false,
+                                    'quicktags' => true,
+                                    'tinymce' => array(
+                                        'toolbar1' => 'formatselect,bold,italic,underline,|,bullist,numlist,|,link,unlink,|,alignleft,aligncenter,alignright,|,forecolor,backcolor,|,removeformat,|,fullscreen',
+                                        'toolbar2' => '',
+                                    ),
+                                ));
+                                ?>
+                            </div>
+
+                            <!-- Attachments Section -->
+                            <div class="nwl-template-attachments-section">
+                                <h4><?php esc_html_e('Document Attachments', 'nursery-waiting-list'); ?></h4>
+                                <p class="description"><?php esc_html_e('Attach documents that will be sent with emails using this template.', 'nursery-waiting-list'); ?></p>
+                                <div class="nwl-attachments-list" id="nwl-attachments-list">
+                                    <?php if (!empty($current_attachments)) : ?>
+                                        <?php foreach ($current_attachments as $attachment_id) :
+                                            $attachment_url = wp_get_attachment_url($attachment_id);
+                                            $attachment_name = basename(get_attached_file($attachment_id));
+                                            if ($attachment_url) :
+                                        ?>
+                                            <div class="nwl-attachment-item" data-id="<?php echo esc_attr($attachment_id); ?>">
+                                                <span class="dashicons dashicons-media-document"></span>
+                                                <span class="nwl-attachment-name"><?php echo esc_html($attachment_name); ?></span>
+                                                <button type="button" class="nwl-remove-attachment" title="<?php esc_attr_e('Remove', 'nursery-waiting-list'); ?>">&times;</button>
+                                                <input type="hidden" name="attachments[]" value="<?php echo esc_attr($attachment_id); ?>">
+                                            </div>
+                                        <?php endif; endforeach; ?>
+                                    <?php endif; ?>
+                                </div>
+                                <button type="button" class="button nwl-add-attachment" id="nwl-add-attachment">
+                                    <span class="dashicons dashicons-paperclip"></span>
+                                    <?php esc_html_e('Add Document', 'nursery-waiting-list'); ?>
+                                </button>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="nwl-template-form-actions">
+                                <div class="nwl-actions-left">
+                                    <?php if (!$current_template->is_system) : ?>
+                                        <button type="button" class="button button-link-delete nwl-delete-template" data-id="<?php echo esc_attr($current_template->id); ?>">
+                                            <?php esc_html_e('Delete Template', 'nursery-waiting-list'); ?>
+                                        </button>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="nwl-actions-right">
+                                    <button type="button" class="button nwl-preview-template"><?php esc_html_e('Preview', 'nursery-waiting-list'); ?></button>
+                                    <button type="submit" class="button button-primary button-large"><?php esc_html_e('Save Template', 'nursery-waiting-list'); ?></button>
+                                </div>
+                            </div>
                         </form>
 
                     <?php elseif ($creating) : ?>
@@ -352,6 +411,78 @@ class NWL_Admin_Templates {
                     $this.removeClass('copied');
                 }, 1000);
             });
+
+            // Insert variable into field
+            $('.nwl-insert-var-btn').on('click', function() {
+                var target = $(this).data('target');
+                var variables = [
+                    '{{child_name}}',
+                    '{{parent_name}}',
+                    '{{waiting_list_number}}',
+                    '{{nursery_name}}',
+                    '{{status}}',
+                    '{{date_added}}'
+                ];
+
+                var selected = prompt('<?php esc_html_e('Enter variable name or choose from: child_name, parent_name, waiting_list_number, nursery_name, status, date_added', 'nursery-waiting-list'); ?>', 'child_name');
+                if (selected) {
+                    var varText = '{{' + selected.replace(/[{}]/g, '') + '}}';
+                    if (target === 'subject') {
+                        var $input = $('#subject');
+                        var cursorPos = $input[0].selectionStart;
+                        var v = $input.val();
+                        $input.val(v.substring(0, cursorPos) + varText + v.substring(cursorPos));
+                    } else if (target === 'body') {
+                        if (typeof tinyMCE !== 'undefined' && tinyMCE.get('body')) {
+                            tinyMCE.get('body').execCommand('mceInsertContent', false, varText);
+                        } else {
+                            var $textarea = $('#body');
+                            var cursorPos = $textarea[0].selectionStart;
+                            var v = $textarea.val();
+                            $textarea.val(v.substring(0, cursorPos) + varText + v.substring(cursorPos));
+                        }
+                    }
+                }
+            });
+
+            // Attachment upload
+            var attachmentFrame;
+            $('#nwl-add-attachment').on('click', function(e) {
+                e.preventDefault();
+
+                if (attachmentFrame) {
+                    attachmentFrame.open();
+                    return;
+                }
+
+                attachmentFrame = wp.media({
+                    title: '<?php esc_html_e('Select Document to Attach', 'nursery-waiting-list'); ?>',
+                    button: { text: '<?php esc_html_e('Attach Document', 'nursery-waiting-list'); ?>' },
+                    multiple: true
+                });
+
+                attachmentFrame.on('select', function() {
+                    var attachments = attachmentFrame.state().get('selection').toJSON();
+                    attachments.forEach(function(attachment) {
+                        if ($('#nwl-attachments-list').find('[data-id="' + attachment.id + '"]').length === 0) {
+                            var html = '<div class="nwl-attachment-item" data-id="' + attachment.id + '">' +
+                                '<span class="dashicons dashicons-media-document"></span>' +
+                                '<span class="nwl-attachment-name">' + attachment.filename + '</span>' +
+                                '<button type="button" class="nwl-remove-attachment" title="<?php esc_attr_e('Remove', 'nursery-waiting-list'); ?>">&times;</button>' +
+                                '<input type="hidden" name="attachments[]" value="' + attachment.id + '">' +
+                                '</div>';
+                            $('#nwl-attachments-list').append(html);
+                        }
+                    });
+                });
+
+                attachmentFrame.open();
+            });
+
+            // Remove attachment
+            $(document).on('click', '.nwl-remove-attachment', function() {
+                $(this).closest('.nwl-attachment-item').remove();
+            });
         });
         </script>
         <?php
@@ -370,10 +501,19 @@ class NWL_Admin_Templates {
         $email_handler = NWL_Email::get_instance();
         $template_id = isset($_POST['template_id']) ? absint($_POST['template_id']) : 0;
 
+        // Process attachments
+        $attachments = array();
+        if (!empty($_POST['attachments']) && is_array($_POST['attachments'])) {
+            $attachments = array_map('absint', $_POST['attachments']);
+            $attachments = array_filter($attachments);
+        }
+
         $data = array(
             'template_name' => sanitize_text_field($_POST['template_name']),
             'subject' => sanitize_text_field($_POST['subject']),
             'body' => wp_kses_post($_POST['body']),
+            'status_trigger' => isset($_POST['status_trigger']) ? sanitize_text_field($_POST['status_trigger']) : '',
+            'attachments' => wp_json_encode($attachments),
             'is_active' => isset($_POST['is_active']) ? 1 : 0,
         );
 

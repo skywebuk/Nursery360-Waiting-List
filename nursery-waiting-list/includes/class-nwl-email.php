@@ -151,7 +151,7 @@ class NWL_Email {
     public function send($to, $subject, $body, $type, $entry_id = null, $template_id = null) {
         $from_name = get_option('nwl_email_from_name', get_bloginfo('name'));
         $from_email = get_option('nwl_email_from_address', get_option('admin_email'));
-        
+
         $headers = array(
             'Content-Type: text/html; charset=UTF-8',
             'From: ' . $from_name . ' <' . $from_email . '>',
@@ -162,12 +162,30 @@ class NWL_Email {
             $headers[] = 'Reply-To: ' . $reply_to;
         }
 
+        // Get attachments from template
+        $attachments = array();
+        if ($template_id) {
+            $template = $this->get_template_by_id($template_id);
+            if ($template && !empty($template->attachments)) {
+                $attachment_ids = json_decode($template->attachments, true);
+                if (is_array($attachment_ids)) {
+                    foreach ($attachment_ids as $attachment_id) {
+                        $file_path = get_attached_file($attachment_id);
+                        if ($file_path && file_exists($file_path)) {
+                            $attachments[] = $file_path;
+                        }
+                    }
+                }
+            }
+        }
+
         // Apply filters for customization
         $headers = apply_filters('nwl_email_headers', $headers, $type, $entry_id);
         $body = apply_filters('nwl_email_body', $body, $type, $entry_id);
         $subject = apply_filters('nwl_email_subject', $subject, $type, $entry_id);
+        $attachments = apply_filters('nwl_email_attachments', $attachments, $type, $entry_id, $template_id);
 
-        $sent = wp_mail($to, $subject, $body, $headers);
+        $sent = wp_mail($to, $subject, $body, $headers, $attachments);
 
         // Log the email
         $this->log_email(array(
@@ -187,11 +205,11 @@ class NWL_Email {
 
         // Add note to entry
         if ($entry_id) {
-            NWL_Entry::get_instance()->add_note(
-                $entry_id,
-                'email',
-                sprintf(__('Email sent: %s', 'nursery-waiting-list'), $subject)
-            );
+            $note_text = sprintf(__('Email sent: %s', 'nursery-waiting-list'), $subject);
+            if (!empty($attachments)) {
+                $note_text .= sprintf(__(' (with %d attachment(s))', 'nursery-waiting-list'), count($attachments));
+            }
+            NWL_Entry::get_instance()->add_note($entry_id, 'email', $note_text);
         }
 
         return true;
@@ -241,13 +259,13 @@ class NWL_Email {
      */
     public function update_template($id, $data) {
         global $wpdb;
-        
+
         $table = $wpdb->prefix . NWL_TABLE_TEMPLATES;
-        
-        $allowed = array('template_name', 'subject', 'body', 'is_active');
+
+        $allowed = array('template_name', 'subject', 'body', 'status_trigger', 'attachments', 'is_active');
         $update_data = array_intersect_key($data, array_flip($allowed));
         $update_data['updated_at'] = current_time('mysql');
-        
+
         return $wpdb->update($table, $update_data, array('id' => $id));
     }
 
