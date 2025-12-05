@@ -315,6 +315,8 @@ class NWL_Stats {
                 'id' => $group['id'],
                 'name' => $group['name'],
                 'capacity' => $group['capacity'],
+                'min_age' => isset($group['min_age']) ? $group['min_age'] : 0,
+                'max_age' => isset($group['max_age']) ? $group['max_age'] : 99,
                 'enrolled' => $enrolled,
                 'available' => max(0, $available),
                 'is_full' => $available <= 0,

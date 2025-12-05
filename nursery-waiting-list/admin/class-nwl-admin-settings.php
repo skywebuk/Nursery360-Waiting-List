@@ -190,11 +190,15 @@ class NWL_Admin_Settings {
             if (isset($_POST['year_group_name']) && is_array($_POST['year_group_name'])) {
                 $names = $_POST['year_group_name'];
                 $capacities = isset($_POST['year_group_capacity']) ? $_POST['year_group_capacity'] : array();
+                $min_ages = isset($_POST['year_group_min_age']) ? $_POST['year_group_min_age'] : array();
+                $max_ages = isset($_POST['year_group_max_age']) ? $_POST['year_group_max_age'] : array();
 
                 $total_allocated = 0;
                 foreach ($names as $index => $name) {
                     $name = sanitize_text_field($name);
                     $capacity = isset($capacities[$index]) ? absint($capacities[$index]) : 0;
+                    $min_age = isset($min_ages[$index]) ? absint($min_ages[$index]) : 0;
+                    $max_age = isset($max_ages[$index]) ? absint($max_ages[$index]) : 0;
 
                     if (!empty($name) && $capacity > 0) {
                         $total_allocated += $capacity;
@@ -202,8 +206,20 @@ class NWL_Admin_Settings {
                             'id' => sanitize_title($name) . '-' . $index,
                             'name' => $name,
                             'capacity' => $capacity,
+                            'min_age' => $min_age,
+                            'max_age' => $max_age,
                         );
                     }
+                }
+
+                // Sort year groups by min_age
+                usort($year_groups, function($a, $b) {
+                    return $a['min_age'] - $b['min_age'];
+                });
+
+                // Re-assign IDs after sorting
+                foreach ($year_groups as $index => &$group) {
+                    $group['id'] = sanitize_title($group['name']) . '-' . $index;
                 }
 
                 // Validate total doesn't exceed occupancy
@@ -284,16 +300,17 @@ class NWL_Admin_Settings {
             <?php endif; ?>
 
             <h2 style="margin-top: 30px;"><?php esc_html_e('Year Groups', 'nursery-waiting-list'); ?></h2>
-            <p class="description"><?php esc_html_e('Create year groups and allocate capacity from your total occupancy. The sum of all year group capacities cannot exceed the total occupancy.', 'nursery-waiting-list'); ?></p>
+            <p class="description"><?php esc_html_e('Create year groups with age ranges. Children will be automatically assigned to a year group based on their date of birth.', 'nursery-waiting-list'); ?></p>
 
             <div id="nwl-year-groups-container">
-                <table class="widefat nwl-year-groups-table" style="max-width: 800px;">
+                <table class="widefat nwl-year-groups-table" style="max-width: 1000px;">
                     <thead>
                         <tr>
-                            <th style="width: 40%;"><?php esc_html_e('Year Group Name', 'nursery-waiting-list'); ?></th>
-                            <th style="width: 15%;"><?php esc_html_e('Capacity', 'nursery-waiting-list'); ?></th>
-                            <th style="width: 15%;"><?php esc_html_e('Enrolled', 'nursery-waiting-list'); ?></th>
-                            <th style="width: 20%;"><?php esc_html_e('Status', 'nursery-waiting-list'); ?></th>
+                            <th style="width: 25%;"><?php esc_html_e('Year Group Name', 'nursery-waiting-list'); ?></th>
+                            <th style="width: 15%;"><?php esc_html_e('Age Range', 'nursery-waiting-list'); ?></th>
+                            <th style="width: 12%;"><?php esc_html_e('Capacity', 'nursery-waiting-list'); ?></th>
+                            <th style="width: 10%;"><?php esc_html_e('Enrolled', 'nursery-waiting-list'); ?></th>
+                            <th style="width: 18%;"><?php esc_html_e('Status', 'nursery-waiting-list'); ?></th>
                             <th style="width: 10%;"><?php esc_html_e('Actions', 'nursery-waiting-list'); ?></th>
                         </tr>
                     </thead>
@@ -303,13 +320,29 @@ class NWL_Admin_Settings {
                                 $enrolled = isset($enrolled_counts[$group['id']]) ? $enrolled_counts[$group['id']] : 0;
                                 $available = $group['capacity'] - $enrolled;
                                 $is_full = $available <= 0;
+                                $min_age = isset($group['min_age']) ? $group['min_age'] : 0;
+                                $max_age = isset($group['max_age']) ? $group['max_age'] : 0;
                             ?>
                                 <tr class="nwl-year-group-row">
                                     <td>
                                         <input type="text" name="year_group_name[]"
                                                value="<?php echo esc_attr($group['name']); ?>"
                                                class="regular-text" required
-                                               placeholder="<?php esc_attr_e('e.g., Babies (0-1)', 'nursery-waiting-list'); ?>">
+                                               placeholder="<?php esc_attr_e('e.g., Babies', 'nursery-waiting-list'); ?>">
+                                    </td>
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 5px;">
+                                            <input type="number" name="year_group_min_age[]"
+                                                   value="<?php echo esc_attr($min_age); ?>"
+                                                   class="small-text" min="0" max="10" style="width: 50px;" required
+                                                   placeholder="0">
+                                            <span>-</span>
+                                            <input type="number" name="year_group_max_age[]"
+                                                   value="<?php echo esc_attr($max_age); ?>"
+                                                   class="small-text" min="0" max="10" style="width: 50px;" required
+                                                   placeholder="2">
+                                            <span style="color: #666; font-size: 12px;"><?php esc_html_e('yrs', 'nursery-waiting-list'); ?></span>
+                                        </div>
                                     </td>
                                     <td>
                                         <input type="number" name="year_group_capacity[]"
@@ -341,7 +374,7 @@ class NWL_Admin_Settings {
                     </tbody>
                     <tfoot>
                         <tr>
-                            <td colspan="5">
+                            <td colspan="6">
                                 <button type="button" id="nwl-add-year-group" class="button">
                                     <span class="dashicons dashicons-plus-alt2" style="vertical-align: middle;"></span>
                                     <?php esc_html_e('Add Year Group', 'nursery-waiting-list'); ?>
@@ -352,8 +385,15 @@ class NWL_Admin_Settings {
                 </table>
             </div>
 
+            <div style="margin-top: 15px; padding: 15px; background: #e8f4f8; border-radius: 4px; max-width: 1000px;">
+                <strong><?php esc_html_e('Example Year Groups:', 'nursery-waiting-list'); ?></strong>
+                <p style="margin: 10px 0 0; color: #666;">
+                    <?php esc_html_e('Babies (0-2 yrs), Toddlers (2-3 yrs), Pre-School (3-4 yrs), Reception (4-5 yrs)', 'nursery-waiting-list'); ?>
+                </p>
+            </div>
+
             <!-- Total Allocated Display -->
-            <div id="nwl-allocation-tracker" style="margin-top: 20px; padding: 15px; background: #fff; border: 1px solid #ddd; border-radius: 4px; max-width: 800px;">
+            <div id="nwl-allocation-tracker" style="margin-top: 20px; padding: 15px; background: #fff; border: 1px solid #ddd; border-radius: 4px; max-width: 1000px;">
                 <strong><?php esc_html_e('Total Allocated:', 'nursery-waiting-list'); ?></strong>
                 <span id="nwl-total-allocated"><?php echo esc_html($total_allocated); ?></span> /
                 <span id="nwl-total-capacity"><?php echo esc_html($total_occupancy); ?></span>
@@ -371,7 +411,19 @@ class NWL_Admin_Settings {
                 <td>
                     <input type="text" name="year_group_name[]"
                            class="regular-text" required
-                           placeholder="<?php esc_attr_e('e.g., Babies (0-1)', 'nursery-waiting-list'); ?>">
+                           placeholder="<?php esc_attr_e('e.g., Babies', 'nursery-waiting-list'); ?>">
+                </td>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 5px;">
+                        <input type="number" name="year_group_min_age[]"
+                               class="small-text" min="0" max="10" style="width: 50px;" value="0" required
+                               placeholder="0">
+                        <span>-</span>
+                        <input type="number" name="year_group_max_age[]"
+                               class="small-text" min="0" max="10" style="width: 50px;" value="2" required
+                               placeholder="2">
+                        <span style="color: #666; font-size: 12px;"><?php esc_html_e('yrs', 'nursery-waiting-list'); ?></span>
+                    </div>
                 </td>
                 <td>
                     <input type="number" name="year_group_capacity[]"

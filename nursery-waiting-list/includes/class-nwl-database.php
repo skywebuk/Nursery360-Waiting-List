@@ -880,4 +880,69 @@ class NWL_Database {
         }
         return apply_filters('nwl_year_groups_options', $options);
     }
+
+    /**
+     * Calculate year group from date of birth
+     *
+     * @param string $dob Date of birth in Y-m-d format
+     * @return string|null Year group ID or null if no matching group
+     */
+    public static function calculate_year_group_from_dob($dob) {
+        if (empty($dob)) {
+            return null;
+        }
+
+        try {
+            $birth_date = new DateTime($dob);
+            $today = new DateTime();
+            $age = $birth_date->diff($today);
+            $age_years = $age->y;
+
+            // Get year groups sorted by min_age
+            $year_groups = self::get_year_groups();
+
+            if (empty($year_groups)) {
+                return null;
+            }
+
+            // Find matching year group based on age
+            foreach ($year_groups as $group) {
+                $min_age = isset($group['min_age']) ? (int) $group['min_age'] : 0;
+                $max_age = isset($group['max_age']) ? (int) $group['max_age'] : 99;
+
+                // Child's age should be >= min_age and < max_age
+                if ($age_years >= $min_age && $age_years < $max_age) {
+                    return $group['id'];
+                }
+            }
+
+            // If no exact match, find the closest year group
+            // Check if child is older than all groups (use the oldest group)
+            $last_group = end($year_groups);
+            if ($last_group && $age_years >= (isset($last_group['max_age']) ? $last_group['max_age'] : 99)) {
+                return $last_group['id'];
+            }
+
+            // Check if child is younger than all groups (use the youngest group)
+            $first_group = reset($year_groups);
+            if ($first_group && $age_years < (isset($first_group['min_age']) ? $first_group['min_age'] : 0)) {
+                return $first_group['id'];
+            }
+
+            return null;
+        } catch (Exception $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Get year group name by ID
+     *
+     * @param string $group_id Year group ID
+     * @return string Year group name or empty string
+     */
+    public static function get_year_group_name($group_id) {
+        $group = self::get_year_group($group_id);
+        return $group ? $group['name'] : '';
+    }
 }
