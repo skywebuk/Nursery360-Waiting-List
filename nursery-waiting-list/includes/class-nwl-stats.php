@@ -234,44 +234,120 @@ class NWL_Stats {
      */
     public function get_entries_needing_attention() {
         global $wpdb;
-        
+
         $table = $wpdb->prefix . NWL_TABLE_ENTRIES;
-        
+
         $attention = array();
-        
+
         // Overdue offers (deadline passed)
         $overdue = $wpdb->get_results(
-            "SELECT * FROM $table 
-            WHERE status = 'offered' 
+            "SELECT * FROM $table
+            WHERE status = 'offered'
             AND offer_deadline < CURDATE()
             ORDER BY offer_deadline ASC"
         );
         $attention['overdue_offers'] = $overdue;
-        
+
         // Long waiting (over 6 months)
         $long_wait = $wpdb->get_results(
-            "SELECT * FROM $table 
+            "SELECT * FROM $table
             WHERE status IN ('pending', 'waitlisted')
             AND created_at < DATE_SUB(NOW(), INTERVAL 6 MONTH)
             ORDER BY created_at ASC"
         );
         $attention['long_waiting'] = $long_wait;
-        
+
         // Pending deletion requests
         $deletion = $wpdb->get_results(
             "SELECT * FROM $table WHERE deletion_requested = 1"
         );
         $attention['deletion_requests'] = $deletion;
-        
+
         // High priority entries
         $high_priority = $wpdb->get_results(
-            "SELECT * FROM $table 
+            "SELECT * FROM $table
             WHERE priority IN ('high', 'urgent')
             AND status NOT IN ('accepted', 'enrolled', 'removed', 'declined')
             ORDER BY FIELD(priority, 'urgent', 'high'), created_at ASC"
         );
         $attention['high_priority'] = $high_priority;
-        
+
         return $attention;
+    }
+
+    /**
+     * Get enrolled counts by year group (custom year groups)
+     */
+    public function get_enrolled_by_year_group() {
+        global $wpdb;
+
+        $table = $wpdb->prefix . NWL_TABLE_ENTRIES;
+
+        // Get enrolled students grouped by year_group field
+        $results = $wpdb->get_results(
+            "SELECT year_group, COUNT(*) as count FROM $table
+            WHERE status = 'enrolled' AND year_group IS NOT NULL AND year_group != ''
+            GROUP BY year_group",
+            OBJECT_K
+        );
+
+        $counts = array();
+        foreach ($results as $key => $row) {
+            $counts[$key] = (int) $row->count;
+        }
+
+        return $counts;
+    }
+
+    /**
+     * Get occupancy statistics for all year groups
+     */
+    public function get_year_group_occupancy() {
+        $year_groups = NWL_Database::get_year_groups();
+        $enrolled_counts = $this->get_enrolled_by_year_group();
+        $occupancy = array();
+
+        foreach ($year_groups as $group) {
+            $enrolled = isset($enrolled_counts[$group['id']]) ? $enrolled_counts[$group['id']] : 0;
+            $available = $group['capacity'] - $enrolled;
+
+            $occupancy[$group['id']] = array(
+                'id' => $group['id'],
+                'name' => $group['name'],
+                'capacity' => $group['capacity'],
+                'enrolled' => $enrolled,
+                'available' => max(0, $available),
+                'is_full' => $available <= 0,
+                'percentage' => $group['capacity'] > 0 ? round(($enrolled / $group['capacity']) * 100, 1) : 0,
+            );
+        }
+
+        return $occupancy;
+    }
+
+    /**
+     * Get total occupancy statistics
+     */
+    public function get_total_occupancy_stats() {
+        $total_capacity = NWL_Database::get_total_occupancy();
+        $year_group_occupancy = $this->get_year_group_occupancy();
+
+        $total_enrolled = 0;
+        $total_allocated = 0;
+
+        foreach ($year_group_occupancy as $group) {
+            $total_enrolled += $group['enrolled'];
+            $total_allocated += $group['capacity'];
+        }
+
+        return array(
+            'total_capacity' => $total_capacity,
+            'total_allocated' => $total_allocated,
+            'total_enrolled' => $total_enrolled,
+            'total_available' => max(0, $total_capacity - $total_enrolled),
+            'unallocated' => $total_capacity - $total_allocated,
+            'percentage' => $total_capacity > 0 ? round(($total_enrolled / $total_capacity) * 100, 1) : 0,
+            'year_groups' => $year_group_occupancy,
+        );
     }
 }

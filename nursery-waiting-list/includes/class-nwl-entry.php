@@ -404,7 +404,7 @@ class NWL_Entry {
             'parent_address_line2', 'parent_city', 'parent_postcode',
             'parent_national_insurance', 'share_code',
             'parental_responsibility', 'relationship_to_child',
-            'age_group', 'days_required', 'sessions_required',
+            'age_group', 'year_group', 'days_required', 'sessions_required',
             'status', 'priority', 'offer_response',
             'waiting_list_number'
         );
