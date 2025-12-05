@@ -806,14 +806,11 @@ class NWL_Database {
      */
     public static function get_statuses() {
         return apply_filters('nwl_statuses', array(
-            'pending' => __('Pending Review', 'nursery-waiting-list'),
-            'contacted' => __('Contacted', 'nursery-waiting-list'),
-            'waitlisted' => __('On Waiting List', 'nursery-waiting-list'),
+            'pending' => __('Pending', 'nursery-waiting-list'),
+            'waitlisted' => __('Waiting List', 'nursery-waiting-list'),
             'offered' => __('Place Offered', 'nursery-waiting-list'),
-            'accepted' => __('Place Accepted', 'nursery-waiting-list'),
-            'declined' => __('Place Declined', 'nursery-waiting-list'),
             'enrolled' => __('Enrolled', 'nursery-waiting-list'),
-            'removed' => __('Withdrawn', 'nursery-waiting-list'),
+            'withdrawn' => __('Withdrawn', 'nursery-waiting-list'),
         ));
     }
 

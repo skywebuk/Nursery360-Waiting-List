@@ -148,13 +148,10 @@
 }
 
 .nwl-badge-pending { background: #fff3cd; color: #856404; }
-.nwl-badge-contacted { background: #d1ecf1; color: #0c5460; }
 .nwl-badge-waitlisted { background: #d4edda; color: #155724; }
 .nwl-badge-offered { background: #4A90A4; color: #fff; }
-.nwl-badge-accepted { background: #28a745; color: #fff; }
 .nwl-badge-enrolled { background: #28a745; color: #fff; }
-.nwl-badge-declined { background: #f8d7da; color: #721c24; }
-.nwl-badge-removed { background: #6c757d; color: #fff; }
+.nwl-badge-withdrawn { background: #6c757d; color: #fff; }
 
 .nwl-badge-info { background: #17a2b8; color: #fff; }
 .nwl-badge-success { background: #28a745; color: #fff; }
@@ -1543,6 +1540,32 @@
     margin-bottom: 20px;
 }
 
+.nwl-total-occupancy-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.nwl-total-summary {
+    font-size: 14px;
+    font-weight: 600;
+    color: #475569;
+}
+
+.nwl-total-remaining {
+    display: inline-block;
+    padding: 6px 14px;
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    color: #2e7d32;
+    border-radius: 20px;
+}
+
+.nwl-total-remaining.nwl-full {
+    background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+    color: #c62828;
+}
+
 .nwl-occupancy-boxes {
     display: flex;
     flex-wrap: wrap;
@@ -1579,6 +1602,39 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.nwl-occupancy-remaining {
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+.nwl-remaining-count {
+    display: block;
+    font-size: 36px;
+    font-weight: 700;
+    color: #16a34a;
+    line-height: 1.1;
+}
+
+.nwl-remaining-count.nwl-full {
+    color: #dc2626;
+}
+
+.nwl-remaining-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 500;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.nwl-occupancy-detail {
+    text-align: center;
+    font-size: 12px;
+    color: #64748b;
+    margin-bottom: 10px;
 }
 
 .nwl-occupancy-stats {

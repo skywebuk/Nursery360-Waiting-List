@@ -103,7 +103,7 @@ class NWL_Stats {
         // Calculate average for active entries
         $average = $wpdb->get_var(
             "SELECT AVG(DATEDIFF(NOW(), created_at)) FROM $table 
-            WHERE status NOT IN ('removed', 'declined', 'enrolled')"
+            WHERE status NOT IN ('withdrawn', 'enrolled')"
         );
         
         return $average ? round($average, 1) : 0;
@@ -194,22 +194,22 @@ class NWL_Stats {
         $offered = (int) $wpdb->get_var(
             "SELECT COUNT(*) FROM $table WHERE status = 'offered'"
         );
-        
-        $accepted = (int) $wpdb->get_var(
-            "SELECT COUNT(*) FROM $table WHERE status IN ('accepted', 'enrolled')"
+
+        $enrolled = (int) $wpdb->get_var(
+            "SELECT COUNT(*) FROM $table WHERE status = 'enrolled'"
         );
-        
-        $declined = (int) $wpdb->get_var(
-            "SELECT COUNT(*) FROM $table WHERE status = 'declined'"
+
+        $withdrawn = (int) $wpdb->get_var(
+            "SELECT COUNT(*) FROM $table WHERE status = 'withdrawn'"
         );
-        
-        $total_decisions = $accepted + $declined;
-        $conversion_rate = $total_decisions > 0 ? round(($accepted / $total_decisions) * 100, 1) : 0;
-        
+
+        $total_decisions = $enrolled + $withdrawn;
+        $conversion_rate = $total_decisions > 0 ? round(($enrolled / $total_decisions) * 100, 1) : 0;
+
         return array(
             'offered' => $offered,
-            'accepted' => $accepted,
-            'declined' => $declined,
+            'enrolled' => $enrolled,
+            'withdrawn' => $withdrawn,
             'pending_response' => $offered,
             'conversion_rate' => $conversion_rate,
         );
@@ -267,7 +267,7 @@ class NWL_Stats {
         $high_priority = $wpdb->get_results(
             "SELECT * FROM $table
             WHERE priority IN ('high', 'urgent')
-            AND status NOT IN ('accepted', 'enrolled', 'removed', 'declined')
+            AND status NOT IN ('enrolled', 'withdrawn')
             ORDER BY FIELD(priority, 'urgent', 'high'), created_at ASC"
         );
         $attention['high_priority'] = $high_priority;
@@ -350,6 +350,27 @@ class NWL_Stats {
             'unallocated' => $total_capacity - $total_allocated,
             'percentage' => $total_capacity > 0 ? round(($total_enrolled / $total_capacity) * 100, 1) : 0,
             'year_groups' => $year_group_occupancy,
+        );
+    }
+
+    /**
+     * Get total occupancy summary (simple version for display)
+     */
+    public function get_total_occupancy_summary() {
+        $year_group_occupancy = $this->get_year_group_occupancy();
+
+        $total_capacity = 0;
+        $total_enrolled = 0;
+
+        foreach ($year_group_occupancy as $group) {
+            $total_capacity += $group['capacity'];
+            $total_enrolled += $group['enrolled'];
+        }
+
+        return array(
+            'total_capacity' => $total_capacity,
+            'total_enrolled' => $total_enrolled,
+            'total_available' => max(0, $total_capacity - $total_enrolled),
         );
     }
 }

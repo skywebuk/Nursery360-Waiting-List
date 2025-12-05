@@ -68,7 +68,7 @@ class NWL_Admin_Entries {
             <!-- Quick Stats -->
             <div class="nwl-quick-stats">
                 <?php foreach ($status_counts as $status => $data) : ?>
-                    <?php if ($data['count'] > 0 || in_array($status, array('pending', 'offered', 'accepted'))) : ?>
+                    <?php if ($data['count'] > 0 || in_array($status, array('pending', 'waitlisted', 'enrolled'))) : ?>
                         <a href="<?php echo esc_url(add_query_arg('status', $status)); ?>"
                            class="nwl-stat-box <?php echo $filters['status'] === $status ? 'active' : ''; ?>">
                             <span class="nwl-stat-count"><?php echo esc_html($data['count']); ?></span>
@@ -84,31 +84,49 @@ class NWL_Admin_Entries {
             if (!empty($year_group_occupancy)) :
             ?>
             <!-- Year Group Occupancy -->
+            <?php $total_summary = $stats->get_total_occupancy_summary(); ?>
             <div class="nwl-year-group-occupancy">
-                <h3 style="margin: 20px 0 10px; font-size: 14px; color: #666;">
-                    <?php esc_html_e('Year Group Capacity', 'nursery-waiting-list'); ?>
-                </h3>
+                <div class="nwl-total-occupancy-header">
+                    <h3 style="margin: 20px 0 10px; font-size: 14px; color: #666;">
+                        <?php esc_html_e('Occupancy', 'nursery-waiting-list'); ?>
+                    </h3>
+                    <div class="nwl-total-summary">
+                        <span class="nwl-total-remaining <?php echo $total_summary['total_available'] <= 0 ? 'nwl-full' : ''; ?>">
+                            <?php printf(
+                                esc_html__('Total: %d remaining of %d', 'nursery-waiting-list'),
+                                $total_summary['total_available'],
+                                $total_summary['total_capacity']
+                            ); ?>
+                        </span>
+                    </div>
+                </div>
                 <div class="nwl-occupancy-boxes">
                     <?php foreach ($year_group_occupancy as $group) : ?>
                         <div class="nwl-occupancy-box <?php echo $group['is_full'] ? 'nwl-full' : ''; ?>">
                             <div class="nwl-occupancy-name"><?php echo esc_html($group['name']); ?></div>
-                            <div class="nwl-occupancy-stats">
-                                <span class="nwl-occupancy-enrolled"><?php echo esc_html($group['enrolled']); ?></span>
-                                <span class="nwl-occupancy-separator">/</span>
-                                <span class="nwl-occupancy-capacity"><?php echo esc_html($group['capacity']); ?></span>
+                            <div class="nwl-occupancy-remaining">
+                                <?php if ($group['is_full']) : ?>
+                                    <span class="nwl-remaining-count nwl-full">0</span>
+                                <?php else : ?>
+                                    <span class="nwl-remaining-count"><?php echo esc_html($group['available']); ?></span>
+                                <?php endif; ?>
+                                <span class="nwl-remaining-label"><?php esc_html_e('remaining', 'nursery-waiting-list'); ?></span>
+                            </div>
+                            <div class="nwl-occupancy-detail">
+                                <?php printf(
+                                    esc_html__('%d enrolled of %d', 'nursery-waiting-list'),
+                                    $group['enrolled'],
+                                    $group['capacity']
+                                ); ?>
                             </div>
                             <div class="nwl-occupancy-progress">
                                 <div class="nwl-occupancy-bar" style="width: <?php echo min(100, $group['percentage']); ?>%;"></div>
                             </div>
-                            <div class="nwl-occupancy-status">
-                                <?php if ($group['is_full']) : ?>
+                            <?php if ($group['is_full']) : ?>
+                                <div class="nwl-occupancy-status">
                                     <span class="nwl-status-full"><?php esc_html_e('FULL', 'nursery-waiting-list'); ?></span>
-                                <?php else : ?>
-                                    <span class="nwl-status-available">
-                                        <?php printf(esc_html__('%d seats available', 'nursery-waiting-list'), $group['available']); ?>
-                                    </span>
-                                <?php endif; ?>
-                            </div>
+                                </div>
+                            <?php endif; ?>
                         </div>
                     <?php endforeach; ?>
                 </div>
