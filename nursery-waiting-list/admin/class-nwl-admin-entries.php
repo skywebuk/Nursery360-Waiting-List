@@ -69,7 +69,7 @@ class NWL_Admin_Entries {
             <div class="nwl-quick-stats">
                 <?php foreach ($status_counts as $status => $data) : ?>
                     <?php if ($data['count'] > 0 || in_array($status, array('pending', 'offered', 'accepted'))) : ?>
-                        <a href="<?php echo esc_url(add_query_arg('status', $status)); ?>" 
+                        <a href="<?php echo esc_url(add_query_arg('status', $status)); ?>"
                            class="nwl-stat-box <?php echo $filters['status'] === $status ? 'active' : ''; ?>">
                             <span class="nwl-stat-count"><?php echo esc_html($data['count']); ?></span>
                             <span class="nwl-stat-label"><?php echo esc_html($data['label']); ?></span>
@@ -77,6 +77,43 @@ class NWL_Admin_Entries {
                     <?php endif; ?>
                 <?php endforeach; ?>
             </div>
+
+            <?php
+            // Year Group Occupancy Boxes
+            $year_group_occupancy = $stats->get_year_group_occupancy();
+            if (!empty($year_group_occupancy)) :
+            ?>
+            <!-- Year Group Occupancy -->
+            <div class="nwl-year-group-occupancy">
+                <h3 style="margin: 20px 0 10px; font-size: 14px; color: #666;">
+                    <?php esc_html_e('Year Group Capacity', 'nursery-waiting-list'); ?>
+                </h3>
+                <div class="nwl-occupancy-boxes">
+                    <?php foreach ($year_group_occupancy as $group) : ?>
+                        <div class="nwl-occupancy-box <?php echo $group['is_full'] ? 'nwl-full' : ''; ?>">
+                            <div class="nwl-occupancy-name"><?php echo esc_html($group['name']); ?></div>
+                            <div class="nwl-occupancy-stats">
+                                <span class="nwl-occupancy-enrolled"><?php echo esc_html($group['enrolled']); ?></span>
+                                <span class="nwl-occupancy-separator">/</span>
+                                <span class="nwl-occupancy-capacity"><?php echo esc_html($group['capacity']); ?></span>
+                            </div>
+                            <div class="nwl-occupancy-progress">
+                                <div class="nwl-occupancy-bar" style="width: <?php echo min(100, $group['percentage']); ?>%;"></div>
+                            </div>
+                            <div class="nwl-occupancy-status">
+                                <?php if ($group['is_full']) : ?>
+                                    <span class="nwl-status-full"><?php esc_html_e('FULL', 'nursery-waiting-list'); ?></span>
+                                <?php else : ?>
+                                    <span class="nwl-status-available">
+                                        <?php printf(esc_html__('%d seats available', 'nursery-waiting-list'), $group['available']); ?>
+                                    </span>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <?php endif; ?>
 
             <!-- Filters -->
             <form method="get" class="nwl-filters-form">
@@ -494,6 +531,39 @@ class NWL_Admin_Entries {
                                            value="<?php echo $is_edit ? esc_attr($entry->preferred_start_date) : ''; ?>">
                                 </div>
                             </div>
+
+                            <?php
+                            // Year Group Selector with Occupancy Info
+                            $year_groups = NWL_Database::get_year_groups();
+                            if (!empty($year_groups)) :
+                                $year_group_occupancy = NWL_Stats::get_instance()->get_year_group_occupancy();
+                            ?>
+                            <div class="nwl-form-row">
+                                <div class="nwl-form-field">
+                                    <label for="year_group"><?php esc_html_e('Year Group', 'nursery-waiting-list'); ?></label>
+                                    <select id="year_group" name="year_group">
+                                        <option value=""><?php esc_html_e('— Select Year Group —', 'nursery-waiting-list'); ?></option>
+                                        <?php foreach ($year_group_occupancy as $group) : ?>
+                                            <option value="<?php echo esc_attr($group['id']); ?>"
+                                                    <?php selected($is_edit && isset($entry->year_group) ? $entry->year_group : '', $group['id']); ?>
+                                                    <?php echo $group['is_full'] ? 'class="nwl-option-full"' : ''; ?>>
+                                                <?php echo esc_html($group['name']); ?>
+                                                (<?php echo esc_html($group['enrolled']); ?>/<?php echo esc_html($group['capacity']); ?>)
+                                                <?php if ($group['is_full']) : ?>
+                                                    - <?php esc_html_e('FULL', 'nursery-waiting-list'); ?>
+                                                <?php else : ?>
+                                                    - <?php printf(esc_html__('%d available', 'nursery-waiting-list'), $group['available']); ?>
+                                                <?php endif; ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <p class="description"><?php esc_html_e('Assign this entry to a year group. Shows current occupancy status.', 'nursery-waiting-list'); ?></p>
+                                </div>
+                                <div class="nwl-form-field">
+                                    <!-- Empty for alignment -->
+                                </div>
+                            </div>
+                            <?php endif; ?>
 
                             <div class="nwl-form-row">
                                 <div class="nwl-form-field">
@@ -921,6 +991,7 @@ class NWL_Admin_Entries {
             'declaration' => absint($_POST['declaration'] ?? 0),
             // Waiting List Details
             'age_group' => sanitize_text_field($_POST['age_group'] ?? ''),
+            'year_group' => sanitize_text_field($_POST['year_group'] ?? ''),
             'preferred_start_date' => sanitize_text_field($_POST['preferred_start_date'] ?? ''),
             'days_required' => sanitize_text_field($_POST['days_required'] ?? ''),
             'hours_per_week' => absint($_POST['hours_per_week'] ?? 0),

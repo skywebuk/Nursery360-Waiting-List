@@ -81,6 +81,7 @@ class NWL_Database {
 
             -- Waiting List Details
             age_group varchar(50) DEFAULT NULL,
+            year_group varchar(100) DEFAULT NULL,
             preferred_start_date date DEFAULT NULL,
             days_required varchar(255) DEFAULT NULL,
             sessions_required varchar(255) DEFAULT NULL,
@@ -118,6 +119,7 @@ class NWL_Database {
             KEY parent_mobile (parent_mobile),
             KEY status (status),
             KEY age_group (age_group),
+            KEY year_group (year_group),
             KEY created_at (created_at),
             KEY gravity_entry_id (gravity_entry_id)
         ) $charset_collate;";
@@ -837,5 +839,45 @@ class NWL_Database {
             'high' => __('High Priority', 'nursery-waiting-list'),
             'urgent' => __('Urgent', 'nursery-waiting-list'),
         ));
+    }
+
+    /**
+     * Get total nursery occupancy
+     */
+    public static function get_total_occupancy() {
+        return absint(get_option('nwl_total_occupancy', 0));
+    }
+
+    /**
+     * Get configured year groups
+     */
+    public static function get_year_groups() {
+        $year_groups = get_option('nwl_year_groups', array());
+        return apply_filters('nwl_year_groups_custom', $year_groups);
+    }
+
+    /**
+     * Get year group by ID
+     */
+    public static function get_year_group($group_id) {
+        $year_groups = self::get_year_groups();
+        foreach ($year_groups as $group) {
+            if ($group['id'] === $group_id) {
+                return $group;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Get year groups as options array for dropdowns
+     */
+    public static function get_year_groups_options() {
+        $year_groups = self::get_year_groups();
+        $options = array();
+        foreach ($year_groups as $group) {
+            $options[$group['id']] = $group['name'];
+        }
+        return apply_filters('nwl_year_groups_options', $options);
     }
 }
