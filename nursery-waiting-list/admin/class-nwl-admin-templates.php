@@ -318,16 +318,29 @@ class NWL_Admin_Templates {
 
                 $btn.prop('disabled', true).text('<?php esc_html_e('Saving...', 'nursery-waiting-list'); ?>');
 
-                // Get editor content if using TinyMCE
+                // Sync TinyMCE content to textarea before serializing
                 if (typeof tinyMCE !== 'undefined' && tinyMCE.get('body')) {
-                    tinyMCE.get('body').save();
+                    tinyMCE.triggerSave();
                 }
 
-                $.post(nwlAdmin.ajaxUrl, $form.serialize() + '&action=nwl_save_template', function(response) {
+                var formData = $form.serialize() + '&action=nwl_save_template';
+
+                $.post(nwlAdmin.ajaxUrl, formData, function(response) {
                     if (response.success) {
-                        if (response.data.redirect) {
+                        // For new templates, redirect to edit page
+                        if (!$form.find('input[name="template_id"]').val() && response.data.redirect) {
                             window.location.href = response.data.redirect;
+                            return;
                         }
+                        // For existing templates, show inline success and stay on page
+                        $btn.text('<?php esc_html_e('Saved!', 'nursery-waiting-list'); ?>');
+                        // Remove any existing notices
+                        $form.find('.nwl-save-notice').remove();
+                        $form.prepend('<div class="notice notice-success nwl-save-notice" style="margin:0 0 15px;"><p>' + (response.data.message || '<?php esc_html_e('Template saved.', 'nursery-waiting-list'); ?>') + '</p></div>');
+                        setTimeout(function() {
+                            $btn.prop('disabled', false).text(originalText);
+                            $form.find('.nwl-save-notice').fadeOut(300, function() { $(this).remove(); });
+                        }, 2000);
                     } else {
                         alert(response.data.message || '<?php esc_html_e('Error saving template.', 'nursery-waiting-list'); ?>');
                         $btn.prop('disabled', false).text(originalText);
@@ -585,8 +598,10 @@ class NWL_Admin_Templates {
             'parent_first_name' => 'Sarah',
             'parent_last_name' => 'Johnson',
             'parent_email' => 'sarah.johnson@example.com',
-            'parent_phone' => '01onal234 567890',
-            'age_group' => '12-24m',
+            'parent_phone' => '01onal 234 567890',
+            'parent_mobile' => '07700 900000',
+            'age_group' => '2-3 years',
+            'year_group' => '',
             'preferred_start_date' => date('Y-m-d', strtotime('+2 months')),
             'status' => 'offered',
             'public_notes' => 'We look forward to welcoming Emma to our nursery family.',

@@ -3,7 +3,7 @@
  * Plugin Name: Nursery360 Waiting List
  * Plugin URI: https://skywebdesign.co.uk
  * Description: A comprehensive waiting list management system for nurseries with Gravity Forms integration, email notifications, parent portal, and admin management.
- * Version: 1.2.0
+ * Version: 1.2.1
  * Author: Sky Web Design
  * Author URI: https://skywebdesign.co.uk
  * License: GPL v2 or later
@@ -20,7 +20,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Plugin constants
-define('NWL_VERSION', '1.2.0');
+define('NWL_VERSION', '1.2.1');
 define('NWL_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('NWL_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('NWL_PLUGIN_BASENAME', plugin_basename(__FILE__));

@@ -58,17 +58,21 @@ class NWL_Email {
         }
 
         $entry = NWL_Entry::get_instance()->get($entry_id);
-        
+
         if (!$entry) {
             return;
         }
 
-        // Try status-specific template first, fall back to generic status_change
-        $status_template_key = 'status_' . $new_status;
-        if ($new_status === 'offered') {
-            $status_template_key = 'place_offered';
+        // Find template by status_trigger column (admin-configurable)
+        $template = $this->get_template_by_status_trigger($new_status);
+
+        // Fall back to convention-based key lookup
+        if (!$template) {
+            $status_template_key = 'status_' . $new_status;
+            $template = $this->get_template($status_template_key);
         }
-        $template = $this->get_template($status_template_key);
+
+        // Final fallback to generic status_change template
         if (!$template) {
             $template = $this->get_template('status_change');
         }
@@ -233,6 +237,20 @@ class NWL_Email {
     }
 
     /**
+     * Get email template by status_trigger value
+     */
+    public function get_template_by_status_trigger($status) {
+        global $wpdb;
+
+        $table = $wpdb->prefix . NWL_TABLE_TEMPLATES;
+
+        return $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM $table WHERE status_trigger = %s AND is_active = 1 ORDER BY id ASC LIMIT 1",
+            $status
+        ));
+    }
+
+    /**
      * Get email template by ID
      */
     public function get_template_by_id($id) {
@@ -341,6 +359,7 @@ class NWL_Email {
             '{{parent_mobile}}' => $entry->parent_mobile,
             '{{date_added}}' => date_i18n(get_option('date_format'), strtotime($entry->created_at)),
             '{{age_group}}' => $entry->age_group,
+            '{{year_group}}' => $this->get_year_group_display_name($entry),
             '{{preferred_start_date}}' => $entry->preferred_start_date ? date_i18n(get_option('date_format'), strtotime($entry->preferred_start_date)) : '',
             '{{status}}' => $entry_handler->get_status_label($entry->status),
             '{{public_notes}}' => $entry->public_notes,
@@ -365,6 +384,18 @@ class NWL_Email {
 
         // Replace placeholders
         return str_replace(array_keys($replacements), array_values($replacements), $template);
+    }
+
+    /**
+     * Resolve year group ID to display name for email templates
+     */
+    private function get_year_group_display_name($entry) {
+        $group_id = isset($entry->year_group) ? $entry->year_group : '';
+        if (empty($group_id)) {
+            return '';
+        }
+        $group = NWL_Database::get_year_group($group_id);
+        return $group ? $group['name'] : $group_id;
     }
 
     /**
@@ -479,6 +510,7 @@ class NWL_Email {
                 '{{parent_mobile}}' => __('Parent/carer\'s mobile number', 'nursery-waiting-list'),
                 '{{date_added}}' => __('Date added to waiting list', 'nursery-waiting-list'),
                 '{{age_group}}' => __('Age group', 'nursery-waiting-list'),
+                '{{year_group}}' => __('Year group name', 'nursery-waiting-list'),
                 '{{preferred_start_date}}' => __('Preferred start date', 'nursery-waiting-list'),
                 '{{status}}' => __('Current status', 'nursery-waiting-list'),
                 '{{public_notes}}' => __('Public notes (visible to parents/carers)', 'nursery-waiting-list'),

@@ -249,13 +249,6 @@ class NWL_Database {
                 'is_system' => 1,
             ),
             array(
-                'template_key' => 'place_offered',
-                'template_name' => 'Place Offered',
-                'subject' => 'A Place Has Become Available - {{child_name}}',
-                'body' => self::get_default_offer_template(),
-                'is_system' => 1,
-            ),
-            array(
                 'template_key' => 'general_update',
                 'template_name' => 'General Update',
                 'subject' => 'Waiting List Update',
@@ -278,20 +271,10 @@ class NWL_Database {
             ));
 
             if (!$existing) {
-                // Insert new template
+                // Insert new template only if it doesn't already exist
                 $wpdb->insert($table, $template);
-            } elseif ($existing->is_system) {
-                // Update existing system template with new content
-                $wpdb->update(
-                    $table,
-                    array(
-                        'body' => $template['body'],
-                        'updated_at' => current_time('mysql'),
-                    ),
-                    array('id' => $existing->id)
-                );
             }
-            // Non-system templates (customized by user) are not updated
+            // Never overwrite existing templates - preserve user edits
         }
     }
 
