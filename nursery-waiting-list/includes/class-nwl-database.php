@@ -41,8 +41,8 @@ class NWL_Database {
     private static function run_migrations($from_version) {
         global $wpdb;
 
-        // v1.3.0: Remove legacy place_offered template (replaced by status_offered)
-        if (version_compare($from_version, '1.3.0', '<')) {
+        // v1.3.2: Remove legacy place_offered template (replaced by status_offered)
+        if (version_compare($from_version, '1.3.2', '<')) {
             $table = $wpdb->prefix . NWL_TABLE_TEMPLATES;
             $has_status_offered = $wpdb->get_var(
                 "SELECT COUNT(*) FROM $table WHERE template_key = 'status_offered'"
