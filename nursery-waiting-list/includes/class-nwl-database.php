@@ -29,8 +29,27 @@ class NWL_Database {
         $installed_version = get_option('nwl_db_version', '0');
         if (version_compare($installed_version, NWL_VERSION, '<')) {
             self::create_tables();
-            self::insert_default_templates(); // Update system templates
+            self::insert_default_templates();
+            self::run_migrations($installed_version);
             update_option('nwl_db_version', NWL_VERSION);
+        }
+    }
+
+    /**
+     * Run version-specific migrations
+     */
+    private static function run_migrations($from_version) {
+        global $wpdb;
+
+        // v1.3.0: Remove legacy place_offered template (replaced by status_offered)
+        if (version_compare($from_version, '1.3.0', '<')) {
+            $table = $wpdb->prefix . NWL_TABLE_TEMPLATES;
+            $has_status_offered = $wpdb->get_var(
+                "SELECT COUNT(*) FROM $table WHERE template_key = 'status_offered'"
+            );
+            if ($has_status_offered) {
+                $wpdb->delete($table, array('template_key' => 'place_offered'));
+            }
         }
     }
 

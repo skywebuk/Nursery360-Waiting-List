@@ -308,6 +308,32 @@ class NWL_Admin_Templates {
 
         <script>
         jQuery(document).ready(function($) {
+            // Track unsaved changes
+            var nwlTemplateDirty = false;
+
+            $('#nwl-template-form').on('change input', 'input, select, textarea', function() {
+                nwlTemplateDirty = true;
+            });
+
+            // Also track TinyMCE changes
+            if (typeof tinyMCE !== 'undefined') {
+                var initInterval = setInterval(function() {
+                    var editor = tinyMCE.get('body');
+                    if (editor) {
+                        editor.on('change keyup', function() {
+                            nwlTemplateDirty = true;
+                        });
+                        clearInterval(initInterval);
+                    }
+                }, 500);
+            }
+
+            $(window).on('beforeunload', function() {
+                if (nwlTemplateDirty) {
+                    return '<?php esc_html_e('You have unsaved changes. Are you sure you want to leave?', 'nursery-waiting-list'); ?>';
+                }
+            });
+
             // Template form submission
             $('#nwl-template-form').on('submit', function(e) {
                 e.preventDefault();
@@ -329,10 +355,12 @@ class NWL_Admin_Templates {
                     if (response.success) {
                         // For new templates, redirect to edit page
                         if (!$form.find('input[name="template_id"]').val() && response.data.redirect) {
+                            nwlTemplateDirty = false;
                             window.location.href = response.data.redirect;
                             return;
                         }
                         // For existing templates, show inline success and stay on page
+                        nwlTemplateDirty = false;
                         $btn.text('<?php esc_html_e('Saved!', 'nursery-waiting-list'); ?>');
                         // Remove any existing notices
                         $form.find('.nwl-save-notice').remove();
@@ -530,6 +558,26 @@ class NWL_Admin_Templates {
             'is_active' => isset($_POST['is_active']) ? 1 : 0,
         );
 
+        // Validate: no other template should use the same status_trigger
+        if (!empty($data['status_trigger'])) {
+            global $wpdb;
+            $table = $wpdb->prefix . NWL_TABLE_TEMPLATES;
+            $conflict = $wpdb->get_row($wpdb->prepare(
+                "SELECT id, template_name FROM $table WHERE status_trigger = %s AND id != %d",
+                $data['status_trigger'],
+                $template_id
+            ));
+            if ($conflict) {
+                wp_send_json_error(array(
+                    'message' => sprintf(
+                        __('The status trigger "%s" is already used by template "%s". Each status can only trigger one template.', 'nursery-waiting-list'),
+                        $data['status_trigger'],
+                        $conflict->template_name
+                    ),
+                ));
+            }
+        }
+
         if ($template_id) {
             // Update existing
             $result = $email_handler->update_template($template_id, $data);
@@ -598,7 +646,7 @@ class NWL_Admin_Templates {
             'parent_first_name' => 'Sarah',
             'parent_last_name' => 'Johnson',
             'parent_email' => 'sarah.johnson@example.com',
-            'parent_phone' => '01onal 234 567890',
+            'parent_phone' => '0121 234 5678',
             'parent_mobile' => '07700 900000',
             'age_group' => '2-3 years',
             'year_group' => '',
