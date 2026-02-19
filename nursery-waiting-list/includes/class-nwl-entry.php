@@ -175,6 +175,20 @@ class NWL_Entry {
     }
 
     /**
+     * Get entry by waiting list number
+     */
+    public function get_by_wl_number($wl_number) {
+        global $wpdb;
+
+        $table = $wpdb->prefix . NWL_TABLE_ENTRIES;
+
+        return $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM $table WHERE waiting_list_number = %s",
+            $wl_number
+        ));
+    }
+
+    /**
      * Get entries with filters
      */
     public function get_entries($args = array()) {
