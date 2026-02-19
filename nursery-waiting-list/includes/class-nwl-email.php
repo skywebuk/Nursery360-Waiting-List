@@ -251,7 +251,7 @@ class NWL_Email {
     }
 
     /**
-     * Get email template by ID
+     * Get email template by ID (no active filter - used for attachments lookup)
      */
     public function get_template_by_id($id) {
         global $wpdb;
@@ -259,7 +259,7 @@ class NWL_Email {
         $table = $wpdb->prefix . NWL_TABLE_TEMPLATES;
 
         return $wpdb->get_row($wpdb->prepare(
-            "SELECT * FROM $table WHERE id = %d AND is_active = 1",
+            "SELECT * FROM $table WHERE id = %d",
             $id
         ));
     }
@@ -287,7 +287,13 @@ class NWL_Email {
         $update_data = array_intersect_key($data, array_flip($allowed));
         $update_data['updated_at'] = current_time('mysql');
 
-        return $wpdb->update($table, $update_data, array('id' => $id));
+        // Build format array for correct SQL types
+        $format = array();
+        foreach ($update_data as $key => $value) {
+            $format[] = ($key === 'is_active') ? '%d' : '%s';
+        }
+
+        return $wpdb->update($table, $update_data, array('id' => $id), $format, array('%d'));
     }
 
     /**
@@ -295,21 +301,23 @@ class NWL_Email {
      */
     public function create_template($data) {
         global $wpdb;
-        
+
         $table = $wpdb->prefix . NWL_TABLE_TEMPLATES;
-        
+
         $insert_data = array(
             'template_key' => sanitize_key($data['template_key']),
             'template_name' => sanitize_text_field($data['template_name']),
             'subject' => sanitize_text_field($data['subject']),
             'body' => wp_kses_post($data['body']),
+            'status_trigger' => isset($data['status_trigger']) ? sanitize_text_field($data['status_trigger']) : '',
+            'attachments' => isset($data['attachments']) ? $data['attachments'] : '[]',
             'is_active' => isset($data['is_active']) ? (int) $data['is_active'] : 1,
             'is_system' => 0,
             'created_at' => current_time('mysql'),
         );
-        
-        $wpdb->insert($table, $insert_data);
-        
+
+        $wpdb->insert($table, $insert_data, array('%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%s'));
+
         return $wpdb->insert_id;
     }
 
