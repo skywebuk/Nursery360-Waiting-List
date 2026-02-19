@@ -175,7 +175,7 @@ class NWL_Admin {
 
         // Date picker
         wp_enqueue_script('jquery-ui-datepicker');
-        wp_enqueue_style('jquery-ui', 'https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css');
+        wp_enqueue_style('wp-jquery-ui-dialog');
 
         // WP Editor for templates
         if (strpos($hook, 'nwl-templates') !== false) {

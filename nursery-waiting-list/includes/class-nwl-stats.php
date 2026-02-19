@@ -65,30 +65,58 @@ class NWL_Stats {
     }
 
     /**
-     * Get counts by age group
+     * Get counts by age group (legacy)
      */
     public function get_counts_by_age_group() {
         global $wpdb;
-        
+
         $table = $wpdb->prefix . NWL_TABLE_ENTRIES;
-        
+
         $results = $wpdb->get_results(
-            "SELECT age_group, COUNT(*) as count FROM $table 
-            WHERE status NOT IN ('removed', 'declined')
+            "SELECT age_group, COUNT(*) as count FROM $table
+            WHERE status NOT IN ('withdrawn')
             GROUP BY age_group",
             OBJECT_K
         );
-        
+
         $counts = array();
         $age_groups = NWL_Database::get_age_groups();
-        
+
         foreach ($age_groups as $key => $label) {
             $counts[$key] = array(
                 'label' => $label,
                 'count' => isset($results[$key]) ? (int) $results[$key]->count : 0,
             );
         }
-        
+
+        return $counts;
+    }
+
+    /**
+     * Get counts by year group
+     */
+    public function get_counts_by_year_group() {
+        global $wpdb;
+
+        $table = $wpdb->prefix . NWL_TABLE_ENTRIES;
+
+        $results = $wpdb->get_results(
+            "SELECT year_group, COUNT(*) as count FROM $table
+            WHERE status NOT IN ('withdrawn')
+            GROUP BY year_group",
+            OBJECT_K
+        );
+
+        $counts = array();
+        $year_groups = NWL_Database::get_year_groups();
+
+        foreach ($year_groups as $group) {
+            $counts[$group['id']] = array(
+                'label' => $group['name'],
+                'count' => isset($results[$group['id']]) ? (int) $results[$group['id']]->count : 0,
+            );
+        }
+
         return $counts;
     }
 
@@ -100,10 +128,10 @@ class NWL_Stats {
         
         $table = $wpdb->prefix . NWL_TABLE_ENTRIES;
         
-        // Calculate average for active entries
+        // Calculate average for active entries only
         $average = $wpdb->get_var(
-            "SELECT AVG(DATEDIFF(NOW(), created_at)) FROM $table 
-            WHERE status NOT IN ('withdrawn', 'enrolled')"
+            "SELECT AVG(DATEDIFF(NOW(), created_at)) FROM $table
+            WHERE status IN ('pending', 'waitlisted', 'offered')"
         );
         
         return $average ? round($average, 1) : 0;
@@ -223,6 +251,7 @@ class NWL_Stats {
             'total_active' => $this->get_total_entries(true),
             'by_status' => $this->get_counts_by_status(),
             'by_age_group' => $this->get_counts_by_age_group(),
+            'by_year_group' => $this->get_counts_by_year_group(),
             'average_wait' => $this->get_average_waiting_time(),
             'monthly_trends' => $this->get_monthly_trends(6),
             'conversion' => $this->get_conversion_stats(),
@@ -358,14 +387,18 @@ class NWL_Stats {
      */
     public function get_total_occupancy_summary() {
         $year_group_occupancy = $this->get_year_group_occupancy();
+        $total_occupancy = absint(get_option('nwl_total_occupancy', 0));
 
-        $total_capacity = 0;
+        $total_allocated = 0;
         $total_enrolled = 0;
 
         foreach ($year_group_occupancy as $group) {
-            $total_capacity += $group['capacity'];
+            $total_allocated += $group['capacity'];
             $total_enrolled += $group['enrolled'];
         }
+
+        // Use the configured total occupancy if set, otherwise fall back to sum of allocations
+        $total_capacity = $total_occupancy > 0 ? $total_occupancy : $total_allocated;
 
         return array(
             'total_capacity' => $total_capacity,

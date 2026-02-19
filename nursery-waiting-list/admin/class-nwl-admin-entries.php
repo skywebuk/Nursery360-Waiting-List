@@ -41,6 +41,7 @@ class NWL_Admin_Entries {
         $filters = array(
             'status' => isset($_GET['status']) ? sanitize_text_field($_GET['status']) : '',
             'age_group' => isset($_GET['age_group']) ? sanitize_text_field($_GET['age_group']) : '',
+            'year_group' => isset($_GET['year_group']) ? sanitize_text_field($_GET['year_group']) : '',
             'date_from' => isset($_GET['date_from']) ? sanitize_text_field($_GET['date_from']) : '',
             'date_to' => isset($_GET['date_to']) ? sanitize_text_field($_GET['date_to']) : '',
             'search' => isset($_GET['s']) ? sanitize_text_field($_GET['s']) : '',
@@ -151,11 +152,11 @@ class NWL_Admin_Entries {
                     </div>
 
                     <div class="nwl-filter-group">
-                        <label><?php esc_html_e('Age Group:', 'nursery-waiting-list'); ?></label>
-                        <select name="age_group">
-                            <option value=""><?php esc_html_e('All Age Groups', 'nursery-waiting-list'); ?></option>
-                            <?php foreach (NWL_Database::get_age_groups() as $key => $label) : ?>
-                                <option value="<?php echo esc_attr($key); ?>" <?php selected($filters['age_group'], $key); ?>>
+                        <label><?php esc_html_e('Year Group:', 'nursery-waiting-list'); ?></label>
+                        <select name="year_group">
+                            <option value=""><?php esc_html_e('All Year Groups', 'nursery-waiting-list'); ?></option>
+                            <?php foreach (NWL_Database::get_year_groups_options() as $key => $label) : ?>
+                                <option value="<?php echo esc_attr($key); ?>" <?php selected(isset($filters['year_group']) ? $filters['year_group'] : '', $key); ?>>
                                     <?php echo esc_html($label); ?>
                                 </option>
                             <?php endforeach; ?>
@@ -349,11 +350,12 @@ class NWL_Admin_Entries {
                 <?php endif; ?>
             </h1>
 
+            <form id="nwl-entry-form" method="post">
+                <?php wp_nonce_field('nwl_save_entry', 'nwl_entry_nonce'); ?>
+                <input type="hidden" name="entry_id" value="<?php echo $is_edit ? esc_attr($entry->id) : ''; ?>">
+
             <div class="nwl-edit-container">
                 <div class="nwl-edit-main">
-                    <form id="nwl-entry-form" method="post">
-                        <?php wp_nonce_field('nwl_save_entry', 'nwl_entry_nonce'); ?>
-                        <input type="hidden" name="entry_id" value="<?php echo $is_edit ? esc_attr($entry->id) : ''; ?>">
 
                         <!-- Child Information -->
                         <div class="nwl-form-section">
@@ -596,12 +598,15 @@ class NWL_Admin_Entries {
 
                             <div class="nwl-form-row">
                                 <div class="nwl-form-field">
+                                    <label for="sessions_required"><?php esc_html_e('Sessions Required', 'nursery-waiting-list'); ?></label>
+                                    <input type="text" id="sessions_required" name="sessions_required"
+                                           value="<?php echo $is_edit ? esc_attr($entry->sessions_required) : ''; ?>"
+                                           placeholder="<?php esc_attr_e('e.g. Morning, Afternoon, Full Day', 'nursery-waiting-list'); ?>">
+                                </div>
+                                <div class="nwl-form-field">
                                     <label for="share_code"><?php esc_html_e('Share Code', 'nursery-waiting-list'); ?></label>
                                     <input type="text" id="share_code" name="share_code"
                                            value="<?php echo $is_edit ? esc_attr($entry->share_code) : ''; ?>">
-                                </div>
-                                <div class="nwl-form-field">
-                                    <!-- Empty for alignment -->
                                 </div>
                             </div>
                         </div>
@@ -635,7 +640,6 @@ class NWL_Admin_Entries {
                                 <?php esc_html_e('Cancel', 'nursery-waiting-list'); ?>
                             </a>
                         </div>
-                    </form>
                 </div>
 
                 <?php if ($is_edit) : ?>
@@ -784,6 +788,7 @@ class NWL_Admin_Entries {
                     </div>
                 <?php endif; ?>
             </div>
+            </form>
         </div>
 
         <!-- Auto Year Group Calculation Script -->
@@ -1055,6 +1060,7 @@ class NWL_Admin_Entries {
             'preferred_start_date' => sanitize_text_field($_POST['preferred_start_date'] ?? ''),
             'days_required' => sanitize_text_field($_POST['days_required'] ?? ''),
             'hours_per_week' => absint($_POST['hours_per_week'] ?? 0),
+            'sessions_required' => sanitize_text_field($_POST['sessions_required'] ?? ''),
             'share_code' => sanitize_text_field($_POST['share_code'] ?? ''),
             // Notes
             'internal_notes' => sanitize_textarea_field($_POST['internal_notes'] ?? ''),

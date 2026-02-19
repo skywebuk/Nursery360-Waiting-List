@@ -245,15 +245,12 @@ class NWL_Public {
     private function get_status_class($status) {
         $classes = array(
             'pending' => 'status-pending',
-            'contacted' => 'status-info',
             'waitlisted' => 'status-info',
             'offered' => 'status-success',
-            'accepted' => 'status-success',
             'enrolled' => 'status-success',
-            'declined' => 'status-warning',
-            'removed' => 'status-error',
+            'withdrawn' => 'status-warning',
         );
-        
+
         return isset($classes[$status]) ? $classes[$status] : 'status-default';
     }
 

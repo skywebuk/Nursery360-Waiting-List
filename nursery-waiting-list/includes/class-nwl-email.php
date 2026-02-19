@@ -63,10 +63,13 @@ class NWL_Email {
             return;
         }
 
-        // Send offer email when status changes to 'offered'
+        // Try status-specific template first, fall back to generic status_change
+        $status_template_key = 'status_' . $new_status;
         if ($new_status === 'offered') {
-            $template = $this->get_template('place_offered');
-        } else {
+            $status_template_key = 'place_offered';
+        }
+        $template = $this->get_template($status_template_key);
+        if (!$template) {
             $template = $this->get_template('status_change');
         }
 

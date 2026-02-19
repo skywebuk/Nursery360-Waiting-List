@@ -183,15 +183,16 @@ class NWL_Admin_Settings {
         // Handle form submission
         if (isset($_POST['nwl_save_occupancy']) && wp_verify_nonce($_POST['nwl_occupancy_nonce'], 'nwl_save_occupancy')) {
             $total_occupancy = absint($_POST['nwl_total_occupancy']);
-            update_option('nwl_total_occupancy', $total_occupancy);
 
             // Process year groups
             $year_groups = array();
+            $validation_failed = false;
             if (isset($_POST['year_group_name']) && is_array($_POST['year_group_name'])) {
                 $names = $_POST['year_group_name'];
                 $capacities = isset($_POST['year_group_capacity']) ? $_POST['year_group_capacity'] : array();
                 $min_ages = isset($_POST['year_group_min_age']) ? $_POST['year_group_min_age'] : array();
                 $max_ages = isset($_POST['year_group_max_age']) ? $_POST['year_group_max_age'] : array();
+                $ids = isset($_POST['year_group_id']) ? $_POST['year_group_id'] : array();
 
                 $total_allocated = 0;
                 foreach ($names as $index => $name) {
@@ -199,11 +200,14 @@ class NWL_Admin_Settings {
                     $capacity = isset($capacities[$index]) ? absint($capacities[$index]) : 0;
                     $min_age = isset($min_ages[$index]) ? absint($min_ages[$index]) : 0;
                     $max_age = isset($max_ages[$index]) ? absint($max_ages[$index]) : 0;
+                    $existing_id = isset($ids[$index]) ? sanitize_text_field($ids[$index]) : '';
 
                     if (!empty($name) && $capacity > 0) {
                         $total_allocated += $capacity;
+                        // Preserve existing ID or generate a stable one using uniqid
+                        $group_id = !empty($existing_id) ? $existing_id : sanitize_title($name) . '-' . uniqid();
                         $year_groups[] = array(
-                            'id' => sanitize_title($name) . '-' . $index,
+                            'id' => $group_id,
                             'name' => $name,
                             'capacity' => $capacity,
                             'min_age' => $min_age,
@@ -217,25 +221,21 @@ class NWL_Admin_Settings {
                     return $a['min_age'] - $b['min_age'];
                 });
 
-                // Re-assign IDs after sorting
-                foreach ($year_groups as $index => &$group) {
-                    $group['id'] = sanitize_title($group['name']) . '-' . $index;
-                }
-
                 // Validate total doesn't exceed occupancy
                 if ($total_allocated > $total_occupancy) {
+                    $validation_failed = true;
                     echo '<div class="notice notice-error"><p>' .
                         sprintf(
                             esc_html__('Error: Total year group capacity (%d) exceeds total occupancy (%d). Please adjust the values.', 'nursery-waiting-list'),
                             $total_allocated,
                             $total_occupancy
                         ) . '</p></div>';
-                } else {
-                    update_option('nwl_year_groups', $year_groups);
-                    echo '<div class="notice notice-success"><p>' . esc_html__('Occupancy settings saved.', 'nursery-waiting-list') . '</p></div>';
                 }
-            } else {
-                update_option('nwl_year_groups', array());
+            }
+
+            if (!$validation_failed) {
+                update_option('nwl_total_occupancy', $total_occupancy);
+                update_option('nwl_year_groups', $year_groups);
                 echo '<div class="notice notice-success"><p>' . esc_html__('Occupancy settings saved.', 'nursery-waiting-list') . '</p></div>';
             }
         }
@@ -325,6 +325,7 @@ class NWL_Admin_Settings {
                             ?>
                                 <tr class="nwl-year-group-row">
                                     <td>
+                                        <input type="hidden" name="year_group_id[]" value="<?php echo esc_attr($group['id']); ?>">
                                         <input type="text" name="year_group_name[]"
                                                value="<?php echo esc_attr($group['name']); ?>"
                                                class="regular-text" required
@@ -409,6 +410,7 @@ class NWL_Admin_Settings {
         <script type="text/template" id="nwl-year-group-template">
             <tr class="nwl-year-group-row">
                 <td>
+                    <input type="hidden" name="year_group_id[]" value="">
                     <input type="text" name="year_group_name[]"
                            class="regular-text" required
                            placeholder="<?php esc_attr_e('e.g., Babies', 'nursery-waiting-list'); ?>">

@@ -183,6 +183,7 @@ class NWL_Entry {
         $defaults = array(
             'status' => '',
             'age_group' => '',
+            'year_group' => '',
             'priority' => '',
             'date_from' => '',
             'date_to' => '',
@@ -215,6 +216,11 @@ class NWL_Entry {
         if (!empty($args['age_group'])) {
             $where[] = 'age_group = %s';
             $values[] = $args['age_group'];
+        }
+
+        if (!empty($args['year_group'])) {
+            $where[] = 'year_group = %s';
+            $values[] = $args['year_group'];
         }
 
         if (!empty($args['priority'])) {
