@@ -2,58 +2,125 @@
  * Nursery Waiting List - Public Styles
  */
 
-/* Container */
-.nwl-lookup-container {
-    max-width: 600px;
-    margin: 40px auto;
-    padding: 0 20px;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+/* ==========================================================================
+   Variables
+   ========================================================================== */
+:root {
+    --nwl-primary: #2563eb;
+    --nwl-primary-light: #dbeafe;
+    --nwl-primary-dark: #1d4ed8;
+    --nwl-text: #1e293b;
+    --nwl-text-light: #64748b;
+    --nwl-text-muted: #94a3b8;
+    --nwl-bg: #f8fafc;
+    --nwl-white: #ffffff;
+    --nwl-border: #e2e8f0;
+    --nwl-border-light: #f1f5f9;
+    --nwl-radius: 16px;
+    --nwl-radius-sm: 10px;
+    --nwl-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 6px 24px rgba(0, 0, 0, 0.06);
+    --nwl-shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.05), 0 20px 48px rgba(0, 0, 0, 0.08);
+    --nwl-transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Status colors */
+    --nwl-pending-bg: #fef3c7;
+    --nwl-pending-text: #92400e;
+    --nwl-pending-accent: #f59e0b;
+    --nwl-waitlisted-bg: #dbeafe;
+    --nwl-waitlisted-text: #1e40af;
+    --nwl-waitlisted-accent: #3b82f6;
+    --nwl-offered-bg: #ede9fe;
+    --nwl-offered-text: #5b21b6;
+    --nwl-offered-accent: #8b5cf6;
+    --nwl-enrolled-bg: #d1fae5;
+    --nwl-enrolled-text: #065f46;
+    --nwl-enrolled-accent: #10b981;
+    --nwl-withdrawn-bg: #f1f5f9;
+    --nwl-withdrawn-text: #475569;
+    --nwl-withdrawn-accent: #94a3b8;
 }
 
-/* Header */
+/* ==========================================================================
+   Container
+   ========================================================================== */
+.nwl-lookup-container {
+    max-width: 640px;
+    margin: 48px auto;
+    padding: 0 20px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ==========================================================================
+   Header
+   ========================================================================== */
 .nwl-lookup-header {
     text-align: center;
-    margin-bottom: 30px;
+    margin-bottom: 32px;
+}
+
+.nwl-lookup-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 20px;
+    background: var(--nwl-primary-light);
+    color: var(--nwl-primary);
+    margin-bottom: 20px;
 }
 
 .nwl-lookup-title {
     font-size: 28px;
-    font-weight: 600;
-    color: #1a1a1a;
+    font-weight: 700;
+    color: var(--nwl-text);
     margin: 0 0 10px;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
 }
 
 .nwl-lookup-description {
     font-size: 16px;
-    color: #666;
+    color: var(--nwl-text-light);
     margin: 0;
     line-height: 1.6;
 }
 
-/* Form */
+/* ==========================================================================
+   Form
+   ========================================================================== */
 .nwl-lookup-form {
-    background: #fff;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    background: var(--nwl-white);
+    padding: 32px;
+    border-radius: var(--nwl-radius);
+    box-shadow: var(--nwl-shadow);
+    border: 1px solid var(--nwl-border);
 }
 
 .nwl-form-group {
-    margin-bottom: 20px;
+    margin-bottom: 24px;
 }
 
 .nwl-label {
     display: block;
-    font-size: 14px;
-    font-weight: 500;
-    color: #333;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--nwl-text);
     margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
 }
 
-/* Type Toggle */
+/* ==========================================================================
+   Type Toggle
+   ========================================================================== */
 .nwl-lookup-type-toggle {
     display: flex;
-    gap: 10px;
+    gap: 8px;
+    background: var(--nwl-bg);
+    padding: 4px;
+    border-radius: var(--nwl-radius-sm);
 }
 
 .nwl-type-btn {
@@ -61,66 +128,90 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    padding: 12px 20px;
-    background: #f5f5f5;
-    border: 2px solid #e0e0e0;
+    gap: 6px;
+    padding: 10px 14px;
+    background: transparent;
+    border: 2px solid transparent;
     border-radius: 8px;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
-    color: #666;
+    color: var(--nwl-text-light);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all var(--nwl-transition);
+    white-space: nowrap;
 }
 
 .nwl-type-btn:hover {
-    background: #eee;
-    border-color: #ccc;
+    background: var(--nwl-white);
+    color: var(--nwl-text);
 }
 
 .nwl-type-btn.active {
-    background: #0d78be;
-    border-color: #0d78be;
-    color: #fff;
+    background: var(--nwl-white);
+    border-color: var(--nwl-primary);
+    color: var(--nwl-primary);
+    box-shadow: 0 1px 3px rgba(37, 99, 235, 0.12);
 }
 
 .nwl-type-btn svg {
     flex-shrink: 0;
+    width: 16px;
+    height: 16px;
 }
 
-/* Input */
+/* ==========================================================================
+   Input
+   ========================================================================== */
+.nwl-input-wrap {
+    position: relative;
+}
+
 .nwl-input {
     width: 100%;
-    padding: 14px 16px;
+    padding: 14px 44px 14px 16px;
     font-size: 16px;
-    border: 2px solid #e0e0e0;
-    border-radius: 8px;
-    transition: border-color 0.2s, box-shadow 0.2s;
+    color: var(--nwl-text);
+    border: 2px solid var(--nwl-border);
+    border-radius: var(--nwl-radius-sm);
+    transition: all var(--nwl-transition);
     box-sizing: border-box;
+    background: var(--nwl-white);
 }
 
 .nwl-input:focus {
     outline: none;
-    border-color: #0d78be;
-    box-shadow: 0 0 0 3px rgba(74, 144, 164, 0.15);
+    border-color: var(--nwl-primary);
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
 }
 
 .nwl-input::placeholder {
-    color: #999;
+    color: var(--nwl-text-muted);
 }
 
-/* Submit Button */
+.nwl-input-icon {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--nwl-text-muted);
+    pointer-events: none;
+    display: flex;
+}
+
+/* ==========================================================================
+   Submit Button
+   ========================================================================== */
 .nwl-submit-btn {
     width: 100%;
     padding: 14px 24px;
     font-size: 16px;
     font-weight: 600;
-    color: #fff;
-    background: linear-gradient(135deg, #0d78be 0%, #0a5f96 100%);
+    color: var(--nwl-white);
+    background: var(--nwl-primary);
     border: none;
-    border-radius: 8px;
+    border-radius: var(--nwl-radius-sm);
     cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: all var(--nwl-transition);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -128,8 +219,9 @@
 }
 
 .nwl-submit-btn:hover {
+    background: var(--nwl-primary-dark);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(74, 144, 164, 0.3);
+    box-shadow: 0 4px 16px rgba(37, 99, 235, 0.3);
 }
 
 .nwl-submit-btn:active {
@@ -157,224 +249,473 @@
     to { transform: rotate(360deg); }
 }
 
-/* Results */
+/* Privacy note */
+.nwl-privacy-note {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin: 20px 0 0;
+    padding: 0;
+    font-size: 12px;
+    color: var(--nwl-text-muted);
+    line-height: 1.4;
+}
+
+.nwl-privacy-note svg {
+    flex-shrink: 0;
+}
+
+/* ==========================================================================
+   Results
+   ========================================================================== */
 .nwl-lookup-results {
-    margin-top: 30px;
+    margin-top: 8px;
+}
+
+.nwl-results-header {
+    margin-bottom: 20px;
+}
+
+.nwl-results-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--nwl-text);
+    margin: 0;
+    letter-spacing: -0.01em;
 }
 
 .nwl-results-list {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 20px;
 }
 
-/* Result Card */
+/* ==========================================================================
+   Result Card
+   ========================================================================== */
 .nwl-result-card {
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    background: var(--nwl-white);
+    border-radius: var(--nwl-radius);
+    box-shadow: var(--nwl-shadow);
+    border: 1px solid var(--nwl-border);
     overflow: hidden;
+    animation: nwl-slideUp 0.4s ease both;
 }
 
+.nwl-results-list .nwl-result-card:nth-child(2) { animation-delay: 0.08s; }
+.nwl-results-list .nwl-result-card:nth-child(3) { animation-delay: 0.16s; }
+
+@keyframes nwl-slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Card top accent border */
+.nwl-result-card.status-pending { border-top: 3px solid var(--nwl-pending-accent); }
+.nwl-result-card.status-waitlisted { border-top: 3px solid var(--nwl-waitlisted-accent); }
+.nwl-result-card.status-offered { border-top: 3px solid var(--nwl-offered-accent); }
+.nwl-result-card.status-enrolled { border-top: 3px solid var(--nwl-enrolled-accent); }
+.nwl-result-card.status-withdrawn { border-top: 3px solid var(--nwl-withdrawn-accent); }
+
+/* Card Header */
 .nwl-result-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
-    padding: 20px;
-    background: linear-gradient(135deg, #f8f9fa 0%, #fff 100%);
-    border-bottom: 1px solid #eee;
+    align-items: center;
+    padding: 24px 24px 20px;
+    gap: 16px;
 }
 
 .nwl-child-info {
+    display: flex;
+    align-items: center;
+    gap: 14px;
     flex: 1;
+    min-width: 0;
+}
+
+.nwl-child-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background: var(--nwl-primary-light);
+    color: var(--nwl-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: 700;
+    flex-shrink: 0;
 }
 
 .nwl-child-name {
-    font-size: 20px;
-    font-weight: 600;
-    color: #1a1a1a;
-    margin: 0 0 5px;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--nwl-text);
+    margin: 0 0 4px;
+    line-height: 1.2;
 }
 
 .nwl-wl-number {
-    font-size: 13px;
-    color: #666;
-    font-family: monospace;
-    background: #f0f0f0;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: var(--nwl-text-muted);
+    font-family: "SF Mono", SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+    background: var(--nwl-bg);
     padding: 3px 8px;
-    border-radius: 4px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all var(--nwl-transition);
+    border: 1px solid transparent;
 }
 
-/* Status Badge */
+.nwl-wl-number:hover {
+    background: var(--nwl-primary-light);
+    color: var(--nwl-primary);
+    border-color: var(--nwl-primary);
+}
+
+.nwl-wl-number svg {
+    flex-shrink: 0;
+}
+
+/* ==========================================================================
+   Status Badge
+   ========================================================================== */
 .nwl-status-badge {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
     padding: 6px 14px;
-    border-radius: 20px;
+    border-radius: 24px;
     font-size: 12px;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
-.status-pending {
-    background: #fff3cd;
-    color: #856404;
+.nwl-status-badge.status-pending {
+    background: var(--nwl-pending-bg);
+    color: var(--nwl-pending-text);
 }
 
-.status-info {
-    background: #d1ecf1;
-    color: #0c5460;
+.nwl-status-badge.status-waitlisted {
+    background: var(--nwl-waitlisted-bg);
+    color: var(--nwl-waitlisted-text);
 }
 
-.status-success {
-    background: #d4edda;
-    color: #155724;
+.nwl-status-badge.status-offered {
+    background: var(--nwl-offered-bg);
+    color: var(--nwl-offered-text);
 }
 
-.status-warning {
-    background: #fff3cd;
-    color: #856404;
+.nwl-status-badge.status-enrolled {
+    background: var(--nwl-enrolled-bg);
+    color: var(--nwl-enrolled-text);
 }
 
-.status-error {
-    background: #f8d7da;
-    color: #721c24;
+.nwl-status-badge.status-withdrawn {
+    background: var(--nwl-withdrawn-bg);
+    color: var(--nwl-withdrawn-text);
 }
 
 .status-default {
-    background: #e9ecef;
-    color: #495057;
+    background: var(--nwl-bg);
+    color: var(--nwl-text-light);
 }
 
-/* Result Details */
-.nwl-result-details {
-    padding: 20px;
+/* ==========================================================================
+   Progress Timeline
+   ========================================================================== */
+.nwl-progress-timeline {
+    padding: 0 24px 20px;
 }
 
-.nwl-detail-row {
+.nwl-progress-bar {
+    height: 4px;
+    background: var(--nwl-border);
+    border-radius: 4px;
+    margin-bottom: 12px;
+    overflow: hidden;
+}
+
+.nwl-progress-fill {
+    height: 100%;
+    background: var(--nwl-primary);
+    border-radius: 4px;
+    transition: width 0.6s ease;
+}
+
+.nwl-progress-steps {
     display: flex;
     justify-content: space-between;
-    padding: 10px 0;
-    border-bottom: 1px solid #f0f0f0;
 }
 
-.nwl-detail-row:last-child {
-    border-bottom: none;
+.nwl-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+}
+
+.nwl-step-dot {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--nwl-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    border: 2px solid var(--nwl-white);
+    box-shadow: 0 0 0 2px var(--nwl-border);
+}
+
+.nwl-step.completed .nwl-step-dot {
+    background: var(--nwl-primary);
+    box-shadow: 0 0 0 2px var(--nwl-primary);
+}
+
+.nwl-step.completed .nwl-step-dot svg {
+    color: var(--nwl-white);
+}
+
+.nwl-step.current .nwl-step-dot {
+    background: var(--nwl-white);
+    box-shadow: 0 0 0 2px var(--nwl-primary), 0 0 0 6px rgba(37, 99, 235, 0.15);
+    border-color: var(--nwl-primary);
+}
+
+.nwl-step-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--nwl-text-muted);
+    text-align: center;
+}
+
+.nwl-step.completed .nwl-step-label,
+.nwl-step.current .nwl-step-label {
+    color: var(--nwl-text);
+    font-weight: 600;
+}
+
+/* ==========================================================================
+   Details Grid
+   ========================================================================== */
+.nwl-result-details {
+    padding: 0 24px 24px;
+}
+
+.nwl-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    background: var(--nwl-bg);
+    padding: 16px;
+    border-radius: var(--nwl-radius-sm);
+}
+
+.nwl-detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
 .nwl-detail-label {
-    font-size: 14px;
-    color: #666;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--nwl-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
 }
 
 .nwl-detail-value {
     font-size: 14px;
-    font-weight: 500;
-    color: #1a1a1a;
+    font-weight: 600;
+    color: var(--nwl-text);
+    line-height: 1.3;
 }
 
 .nwl-deadline .nwl-deadline-date {
-    color: #dc3545;
-    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: #dc2626;
+    font-weight: 700;
 }
 
-/* Result Notes */
+.nwl-deadline .nwl-deadline-date svg {
+    flex-shrink: 0;
+}
+
+/* ==========================================================================
+   Notes
+   ========================================================================== */
 .nwl-result-notes {
-    padding: 15px 20px;
-    background: #f8f9fa;
-    border-top: 1px solid #eee;
+    display: flex;
+    gap: 12px;
+    padding: 16px 24px;
+    background: var(--nwl-bg);
+    border-top: 1px solid var(--nwl-border);
+}
+
+.nwl-notes-icon {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: var(--nwl-primary-light);
+    color: var(--nwl-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .nwl-result-notes strong {
-    font-size: 13px;
-    color: #666;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--nwl-text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 4px;
 }
 
 .nwl-result-notes p {
     margin: 0;
     font-size: 14px;
-    color: #333;
+    color: var(--nwl-text);
     line-height: 1.6;
 }
 
-/* Results Footer */
+/* ==========================================================================
+   Results Footer
+   ========================================================================== */
 .nwl-results-footer {
     text-align: center;
-    margin-top: 25px;
-    padding-top: 25px;
-    border-top: 1px solid #eee;
+    margin-top: 28px;
+    padding-top: 28px;
+    border-top: 1px solid var(--nwl-border);
 }
 
 .nwl-results-footer p {
     font-size: 14px;
-    color: #666;
-    margin: 0 0 15px;
+    color: var(--nwl-text-light);
+    margin: 0 0 16px;
 }
 
 .nwl-new-search-btn {
-    padding: 12px 30px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 28px;
     font-size: 14px;
-    font-weight: 500;
-    color: #0d78be;
-    background: #fff;
-    border: 2px solid #0d78be;
-    border-radius: 8px;
+    font-weight: 600;
+    color: var(--nwl-primary);
+    background: var(--nwl-white);
+    border: 2px solid var(--nwl-primary);
+    border-radius: var(--nwl-radius-sm);
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all var(--nwl-transition);
 }
 
 .nwl-new-search-btn:hover {
-    background: #0d78be;
-    color: #fff;
+    background: var(--nwl-primary);
+    color: var(--nwl-white);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
 }
 
-/* Error/Not Found Message */
+/* ==========================================================================
+   Error / Not Found
+   ========================================================================== */
 .nwl-error-message {
     text-align: center;
-    padding: 40px 20px;
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    padding: 48px 32px;
+    background: var(--nwl-white);
+    border-radius: var(--nwl-radius);
+    box-shadow: var(--nwl-shadow);
+    border: 1px solid var(--nwl-border);
 }
 
 .nwl-error-message .nwl-error-icon {
-    width: 60px;
-    height: 60px;
+    width: 64px;
+    height: 64px;
     margin: 0 auto 20px;
-    background: #f8d7da;
-    border-radius: 50%;
+    background: #fef2f2;
+    border-radius: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 .nwl-error-message .nwl-error-icon svg {
-    color: #dc3545;
+    color: #ef4444;
 }
 
 .nwl-error-message h3 {
-    font-size: 18px;
-    color: #1a1a1a;
-    margin: 0 0 10px;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--nwl-text);
+    margin: 0 0 8px;
 }
 
 .nwl-error-message p {
-    font-size: 14px;
-    color: #666;
-    margin: 0;
+    font-size: 15px;
+    color: var(--nwl-text-light);
+    margin: 0 0 24px;
+    line-height: 1.5;
 }
 
-/* Responsive */
-@media screen and (max-width: 600px) {
+.nwl-error-message .nwl-new-search-btn {
+    margin-top: 0;
+}
+
+/* Copy tooltip */
+.nwl-copied-tooltip {
+    position: absolute;
+    background: var(--nwl-text);
+    color: var(--nwl-white);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 6px;
+    pointer-events: none;
+    animation: nwl-tooltipFade 1.2s ease forwards;
+    white-space: nowrap;
+    z-index: 10;
+}
+
+@keyframes nwl-tooltipFade {
+    0% { opacity: 0; transform: translateY(4px); }
+    20% { opacity: 1; transform: translateY(0); }
+    80% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-4px); }
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+@media screen and (max-width: 640px) {
     .nwl-lookup-container {
-        margin: 20px auto;
-        padding: 0 15px;
+        margin: 24px auto;
+        padding: 0 16px;
     }
 
     .nwl-lookup-form {
-        padding: 20px;
+        padding: 24px 20px;
     }
 
     .nwl-lookup-title {
@@ -383,79 +724,65 @@
 
     .nwl-lookup-type-toggle {
         flex-direction: column;
+        gap: 6px;
+    }
+
+    .nwl-type-btn {
+        padding: 10px 12px;
     }
 
     .nwl-result-header {
         flex-direction: column;
-        gap: 15px;
+        align-items: flex-start;
+        padding: 20px;
+        gap: 12px;
     }
 
-    .nwl-detail-row {
-        flex-direction: column;
-        gap: 5px;
+    .nwl-detail-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
     }
 
-    .nwl-detail-label {
-        font-size: 12px;
+    .nwl-progress-steps {
+        gap: 2px;
     }
-}
 
-/* Animation for loading */
-@keyframes nwl-fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
+    .nwl-step-label {
+        font-size: 10px;
     }
-    to {
-        opacity: 1;
-        transform: translateY(0);
+
+    .nwl-result-details {
+        padding: 0 20px 20px;
     }
-}
 
-.nwl-result-card {
-    animation: nwl-fadeIn 0.3s ease;
-}
+    .nwl-result-notes {
+        padding: 16px 20px;
+    }
 
-.nwl-results-list .nwl-result-card:nth-child(2) {
-    animation-delay: 0.1s;
-}
-
-.nwl-results-list .nwl-result-card:nth-child(3) {
-    animation-delay: 0.2s;
+    .nwl-progress-timeline {
+        padding: 0 20px 16px;
+    }
 }
 
 /* ==========================================================================
-   Accessibility Improvements
+   Accessibility
    ========================================================================== */
 
-/* Focus states for better keyboard navigation */
-.nwl-lookup-container a:focus,
-.nwl-lookup-container button:focus,
-.nwl-lookup-container input:focus,
-.nwl-lookup-container select:focus {
-    outline: 3px solid #0d78be;
+/* Focus states */
+.nwl-lookup-container a:focus-visible,
+.nwl-lookup-container button:focus-visible,
+.nwl-lookup-container input:focus-visible {
+    outline: 3px solid var(--nwl-primary);
     outline-offset: 2px;
-    box-shadow: 0 0 0 4px rgba(74, 144, 164, 0.2);
 }
 
-/* Skip link for keyboard users */
-.nwl-skip-link {
-    position: absolute;
-    top: -40px;
-    left: 0;
-    background: #0d78be;
-    color: #fff;
-    padding: 8px 16px;
-    z-index: 100001;
-    text-decoration: none;
-    border-radius: 0 0 4px 0;
+.nwl-submit-btn:focus-visible {
+    outline: 3px solid var(--nwl-white);
+    outline-offset: -4px;
+    box-shadow: 0 0 0 3px var(--nwl-primary);
 }
 
-.nwl-skip-link:focus {
-    top: 0;
-}
-
-/* High contrast mode support */
+/* High contrast mode */
 @media (prefers-contrast: high) {
     .nwl-type-btn {
         border: 3px solid #333;
@@ -482,24 +809,18 @@
     }
 }
 
-/* Reduced motion support */
+/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-    .nwl-result-card,
-    .nwl-submit-btn,
-    .nwl-type-btn,
-    .nwl-input,
-    .nwl-spinner,
-    * {
-        transition: none !important;
-        animation: none !important;
-    }
-
-    .nwl-spinner {
-        animation: none !important;
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
     }
 }
 
-/* Screen reader only content */
+/* Screen reader only */
 .nwl-sr-only {
     position: absolute;
     width: 1px;
@@ -511,22 +832,3 @@
     white-space: nowrap;
     border: 0;
 }
-
-/* Better focus visible for form elements */
-.nwl-type-btn:focus-visible {
-    outline: 3px solid #0d78be;
-    outline-offset: 2px;
-}
-
-.nwl-submit-btn:focus-visible {
-    outline: 3px solid #fff;
-    outline-offset: -4px;
-}
-
-/* Ensure text is readable against backgrounds */
-.nwl-status-badge {
-    min-width: 80px;
-    text-align: center;
-}
-
-/* Light mode only - consistent white background with dark text */

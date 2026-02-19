@@ -171,13 +171,16 @@ class NWL_Database {
             template_name varchar(255) NOT NULL,
             subject varchar(500) NOT NULL,
             body longtext NOT NULL,
+            status_trigger varchar(50) DEFAULT NULL,
+            attachments longtext DEFAULT NULL,
             is_active tinyint(1) DEFAULT 1,
             is_system tinyint(1) DEFAULT 0,
             created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
             updated_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            
+
             PRIMARY KEY (id),
-            UNIQUE KEY template_key (template_key)
+            UNIQUE KEY template_key (template_key),
+            KEY status_trigger (status_trigger)
         ) $charset_collate;";
 
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
@@ -196,6 +199,48 @@ class NWL_Database {
         $table = $wpdb->prefix . NWL_TABLE_TEMPLATES;
         
         $templates = array(
+            // Status-specific templates (5 main statuses)
+            array(
+                'template_key' => 'status_pending',
+                'template_name' => 'Pending - New Application',
+                'subject' => 'Application Received - Reference: {{waiting_list_number}}',
+                'body' => self::get_default_registration_template(),
+                'status_trigger' => 'pending',
+                'is_system' => 1,
+            ),
+            array(
+                'template_key' => 'status_waitlisted',
+                'template_name' => 'Waiting List - Added to List',
+                'subject' => 'You Are On Our Waiting List - {{child_name}}',
+                'body' => self::get_default_waitlist_template(),
+                'status_trigger' => 'waitlisted',
+                'is_system' => 1,
+            ),
+            array(
+                'template_key' => 'status_offered',
+                'template_name' => 'Place Offered',
+                'subject' => 'A Place Has Become Available - {{child_name}}',
+                'body' => self::get_default_offer_template(),
+                'status_trigger' => 'offered',
+                'is_system' => 1,
+            ),
+            array(
+                'template_key' => 'status_enrolled',
+                'template_name' => 'Enrolled - Welcome',
+                'subject' => 'Welcome to {{nursery_name}} - {{child_name}}',
+                'body' => self::get_default_enrolled_template(),
+                'status_trigger' => 'enrolled',
+                'is_system' => 1,
+            ),
+            array(
+                'template_key' => 'status_withdrawn',
+                'template_name' => 'Withdrawn - Confirmation',
+                'subject' => 'Waiting List Application Withdrawn - {{child_name}}',
+                'body' => self::get_default_withdrawn_template(),
+                'status_trigger' => 'withdrawn',
+                'is_system' => 1,
+            ),
+            // Legacy templates (for backwards compatibility)
             array(
                 'template_key' => 'registration_confirmation',
                 'template_name' => 'Registration Confirmation',
@@ -204,31 +249,10 @@ class NWL_Database {
                 'is_system' => 1,
             ),
             array(
-                'template_key' => 'place_offered',
-                'template_name' => 'Place Offered',
-                'subject' => 'A Place Has Become Available - {{child_name}}',
-                'body' => self::get_default_offer_template(),
-                'is_system' => 1,
-            ),
-            array(
                 'template_key' => 'general_update',
                 'template_name' => 'General Update',
                 'subject' => 'Waiting List Update',
                 'body' => self::get_default_update_template(),
-                'is_system' => 1,
-            ),
-            array(
-                'template_key' => 'follow_up',
-                'template_name' => 'Follow Up Reminder',
-                'subject' => 'Following Up On Your Waiting List Application',
-                'body' => self::get_default_followup_template(),
-                'is_system' => 1,
-            ),
-            array(
-                'template_key' => 'status_change',
-                'template_name' => 'Status Change Notification',
-                'subject' => 'Update on Your Waiting List Application',
-                'body' => self::get_default_status_template(),
                 'is_system' => 1,
             ),
             array(
@@ -247,20 +271,10 @@ class NWL_Database {
             ));
 
             if (!$existing) {
-                // Insert new template
+                // Insert new template only if it doesn't already exist
                 $wpdb->insert($table, $template);
-            } elseif ($existing->is_system) {
-                // Update existing system template with new content
-                $wpdb->update(
-                    $table,
-                    array(
-                        'body' => $template['body'],
-                        'updated_at' => current_time('mysql'),
-                    ),
-                    array('id' => $existing->id)
-                );
             }
-            // Non-system templates (customized by user) are not updated
+            // Never overwrite existing templates - preserve user edits
         }
     }
 
@@ -683,6 +697,161 @@ class NWL_Database {
     }
 
     /**
+     * Default waitlist notification template
+     */
+    private static function get_default_waitlist_template() {
+        return '<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>On Waiting List</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, \'Helvetica Neue\', Arial, sans-serif; background-color: #f4f7fa; line-height: 1.6;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f4f7fa;">
+        <tr>
+            <td align="center" style="padding: 40px 20px;">
+                <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="max-width: 600px; width: 100%;">
+                    <tr>
+                        <td style="background: linear-gradient(135deg, #28a745 0%, #1e7b34 100%); padding: 40px 30px; text-align: center; border-radius: 12px 12px 0 0;">
+                            <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 600;">You\'re On Our Waiting List</h1>
+                            <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0; font-size: 16px;">Your application has been reviewed and added to our waiting list</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="background: #ffffff; padding: 40px 30px; border-radius: 0 0 12px 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+                            <p style="color: #333; font-size: 16px; margin: 0 0 20px;">Dear {{parent_name}},</p>
+                            <p style="color: #555; font-size: 15px; margin: 0 0 25px;">Great news! Your application for <strong style="color: #333;">{{child_name}}</strong> has been reviewed and is now officially on our waiting list.</p>
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background: #f8fafc; border-radius: 8px; margin: 25px 0;">
+                                <tr>
+                                    <td style="padding: 25px; border-left: 4px solid #28a745;">
+                                        <h3 style="color: #333; margin: 0 0 15px; font-size: 16px;">Your Waiting List Details</h3>
+                                        <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                                            <tr><td style="padding: 8px 0; color: #666; font-size: 14px;">Reference:</td><td style="padding: 8px 0; color: #333; font-size: 14px; font-weight: 600;">{{waiting_list_number}}</td></tr>
+                                            <tr><td style="padding: 8px 0; color: #666; font-size: 14px;">Child\'s Name:</td><td style="padding: 8px 0; color: #333; font-size: 14px; font-weight: 600;">{{child_name}}</td></tr>
+                                            {{#preferred_start_date}}<tr><td style="padding: 8px 0; color: #666; font-size: 14px;">Preferred Start:</td><td style="padding: 8px 0; color: #333; font-size: 14px; font-weight: 600;">{{preferred_start_date}}</td></tr>{{/preferred_start_date}}
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                            {{#public_notes}}<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background: #e8f5e9; border-radius: 8px; margin: 25px 0;"><tr><td style="padding: 20px;"><p style="color: #2e7d32; margin: 0; font-size: 14px;">{{public_notes}}</p></td></tr></table>{{/public_notes}}
+                            <p style="color: #555; font-size: 15px; margin: 25px 0;">We will contact you as soon as a suitable place becomes available. You can check your status online at any time using the button below.</p>
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin: 30px 0;"><tr><td align="center"><a href="{{stats_page_url}}" style="display: inline-block; background: linear-gradient(135deg, #28a745 0%, #1e7b34 100%); color: #ffffff; text-decoration: none; padding: 14px 35px; border-radius: 8px; font-size: 15px; font-weight: 600;">Check Your Status</a></td></tr></table>
+                            <p style="color: #333; font-size: 15px; margin: 20px 0 0;">Kind regards,<br><strong>{{nursery_name}}</strong></p>
+                        </td>
+                    </tr>
+                    <tr><td style="padding: 30px; text-align: center;"><p style="color: #888; font-size: 13px; margin: 0 0 5px;">{{nursery_name}}</p><p style="color: #888; font-size: 13px; margin: 0 0 5px;">{{nursery_address}}</p><p style="color: #888; font-size: 13px; margin: 0;">Tel: {{nursery_phone}} | Email: {{nursery_email}}</p></td></tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>';
+    }
+
+    /**
+     * Default enrolled template
+     */
+    private static function get_default_enrolled_template() {
+        return '<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Our Nursery</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, \'Helvetica Neue\', Arial, sans-serif; background-color: #f4f7fa; line-height: 1.6;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f4f7fa;">
+        <tr>
+            <td align="center" style="padding: 40px 20px;">
+                <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="max-width: 600px; width: 100%;">
+                    <tr>
+                        <td style="background: linear-gradient(135deg, #28a745 0%, #1e7b34 100%); padding: 40px 30px; text-align: center; border-radius: 12px 12px 0 0;">
+                            <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 600;">Welcome to Our Nursery Family!</h1>
+                            <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0; font-size: 16px;">{{child_name}} is now officially enrolled</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="background: #ffffff; padding: 40px 30px; border-radius: 0 0 12px 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+                            <p style="color: #333; font-size: 16px; margin: 0 0 20px;">Dear {{parent_name}},</p>
+                            <p style="color: #555; font-size: 15px; margin: 0 0 25px;">We are delighted to confirm that <strong style="color: #333;">{{child_name}}</strong> has been enrolled at {{nursery_name}}. We are thrilled to welcome you to our nursery family!</p>
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background: #e8f5e9; border-radius: 8px; margin: 25px 0;">
+                                <tr>
+                                    <td style="padding: 25px; text-align: center;">
+                                        <h3 style="color: #2e7d32; margin: 0 0 10px; font-size: 18px;">Enrollment Confirmed</h3>
+                                        <p style="color: #333; margin: 0; font-size: 15px;">Reference: <strong>{{waiting_list_number}}</strong></p>
+                                    </td>
+                                </tr>
+                            </table>
+                            <h3 style="color: #333; margin: 25px 0 15px; font-size: 16px;">What Happens Next?</h3>
+                            <ul style="color: #555; font-size: 15px; margin: 0; padding-left: 20px;">
+                                <li style="margin-bottom: 10px;">We will be in touch shortly to arrange settling-in sessions</li>
+                                <li style="margin-bottom: 10px;">Please ensure all registration paperwork is completed</li>
+                                <li style="margin-bottom: 10px;">Feel free to contact us with any questions</li>
+                            </ul>
+                            {{#public_notes}}<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background: #f8fafc; border-radius: 8px; margin: 25px 0;"><tr><td style="padding: 20px;"><p style="color: #555; margin: 0; font-size: 14px;"><strong>Important:</strong> {{public_notes}}</p></td></tr></table>{{/public_notes}}
+                            <p style="color: #555; font-size: 15px; margin: 25px 0 0;">We very much look forward to welcoming {{child_name}} and getting to know your family.</p>
+                            <p style="color: #333; font-size: 15px; margin: 20px 0 0;">Warmest regards,<br><strong>{{nursery_name}}</strong></p>
+                        </td>
+                    </tr>
+                    <tr><td style="padding: 30px; text-align: center;"><p style="color: #888; font-size: 13px; margin: 0 0 5px;">{{nursery_name}}</p><p style="color: #888; font-size: 13px; margin: 0 0 5px;">{{nursery_address}}</p><p style="color: #888; font-size: 13px; margin: 0;">Tel: {{nursery_phone}} | Email: {{nursery_email}}</p></td></tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>';
+    }
+
+    /**
+     * Default withdrawn template
+     */
+    private static function get_default_withdrawn_template() {
+        return '<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Withdrawn</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, \'Helvetica Neue\', Arial, sans-serif; background-color: #f4f7fa; line-height: 1.6;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f4f7fa;">
+        <tr>
+            <td align="center" style="padding: 40px 20px;">
+                <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="max-width: 600px; width: 100%;">
+                    <tr>
+                        <td style="background: linear-gradient(135deg, #6c757d 0%, #545b62 100%); padding: 40px 30px; text-align: center; border-radius: 12px 12px 0 0;">
+                            <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 600;">Application Withdrawn</h1>
+                            <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0; font-size: 16px;">Confirmation of your waiting list withdrawal</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="background: #ffffff; padding: 40px 30px; border-radius: 0 0 12px 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+                            <p style="color: #333; font-size: 16px; margin: 0 0 20px;">Dear {{parent_name}},</p>
+                            <p style="color: #555; font-size: 15px; margin: 0 0 25px;">This email confirms that the waiting list application for <strong style="color: #333;">{{child_name}}</strong> has been withdrawn from our records.</p>
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background: #f8fafc; border-radius: 8px; margin: 25px 0;">
+                                <tr>
+                                    <td style="padding: 20px; border-left: 4px solid #6c757d;">
+                                        <p style="color: #666; margin: 0; font-size: 14px;">Reference number: <strong style="color: #333;">{{waiting_list_number}}</strong></p>
+                                    </td>
+                                </tr>
+                            </table>
+                            {{#public_notes}}<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background: #f8fafc; border-radius: 8px; margin: 25px 0;"><tr><td style="padding: 20px;"><p style="color: #555; margin: 0; font-size: 14px;">{{public_notes}}</p></td></tr></table>{{/public_notes}}
+                            <p style="color: #555; font-size: 15px; margin: 25px 0;">If you change your mind in the future, please don\'t hesitate to submit a new application. We would be happy to consider {{child_name}} for a place at our nursery.</p>
+                            <p style="color: #555; font-size: 15px; margin: 25px 0 0;">We wish you and your family all the best.</p>
+                            <p style="color: #333; font-size: 15px; margin: 20px 0 0;">Kind regards,<br><strong>{{nursery_name}}</strong></p>
+                        </td>
+                    </tr>
+                    <tr><td style="padding: 30px; text-align: center;"><p style="color: #888; font-size: 13px; margin: 0 0 5px;">{{nursery_name}}</p><p style="color: #888; font-size: 13px; margin: 0 0 5px;">{{nursery_address}}</p><p style="color: #888; font-size: 13px; margin: 0;">Tel: {{nursery_phone}} | Email: {{nursery_email}}</p></td></tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>';
+    }
+
+    /**
      * Admin notification template - Modern UK Nursery Style
      */
     private static function get_admin_notification_template() {
@@ -806,14 +975,11 @@ class NWL_Database {
      */
     public static function get_statuses() {
         return apply_filters('nwl_statuses', array(
-            'pending' => __('Pending Review', 'nursery-waiting-list'),
-            'contacted' => __('Contacted', 'nursery-waiting-list'),
-            'waitlisted' => __('On Waiting List', 'nursery-waiting-list'),
+            'pending' => __('Pending', 'nursery-waiting-list'),
+            'waitlisted' => __('Waiting List', 'nursery-waiting-list'),
             'offered' => __('Place Offered', 'nursery-waiting-list'),
-            'accepted' => __('Place Accepted', 'nursery-waiting-list'),
-            'declined' => __('Place Declined', 'nursery-waiting-list'),
             'enrolled' => __('Enrolled', 'nursery-waiting-list'),
-            'removed' => __('Withdrawn', 'nursery-waiting-list'),
+            'withdrawn' => __('Withdrawn', 'nursery-waiting-list'),
         ));
     }
 
@@ -879,5 +1045,70 @@ class NWL_Database {
             $options[$group['id']] = $group['name'];
         }
         return apply_filters('nwl_year_groups_options', $options);
+    }
+
+    /**
+     * Calculate year group from date of birth
+     *
+     * @param string $dob Date of birth in Y-m-d format
+     * @return string|null Year group ID or null if no matching group
+     */
+    public static function calculate_year_group_from_dob($dob) {
+        if (empty($dob)) {
+            return null;
+        }
+
+        try {
+            $birth_date = new DateTime($dob);
+            $today = new DateTime();
+            $age = $birth_date->diff($today);
+            $age_years = $age->y;
+
+            // Get year groups sorted by min_age
+            $year_groups = self::get_year_groups();
+
+            if (empty($year_groups)) {
+                return null;
+            }
+
+            // Find matching year group based on age
+            foreach ($year_groups as $group) {
+                $min_age = isset($group['min_age']) ? (int) $group['min_age'] : 0;
+                $max_age = isset($group['max_age']) ? (int) $group['max_age'] : 99;
+
+                // Child's age should be >= min_age and < max_age
+                if ($age_years >= $min_age && $age_years < $max_age) {
+                    return $group['id'];
+                }
+            }
+
+            // If no exact match, find the closest year group
+            // Check if child is older than all groups (use the oldest group)
+            $last_group = end($year_groups);
+            if ($last_group && $age_years >= (isset($last_group['max_age']) ? $last_group['max_age'] : 99)) {
+                return $last_group['id'];
+            }
+
+            // Check if child is younger than all groups (use the youngest group)
+            $first_group = reset($year_groups);
+            if ($first_group && $age_years < (isset($first_group['min_age']) ? $first_group['min_age'] : 0)) {
+                return $first_group['id'];
+            }
+
+            return null;
+        } catch (Exception $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Get year group name by ID
+     *
+     * @param string $group_id Year group ID
+     * @return string Year group name or empty string
+     */
+    public static function get_year_group_name($group_id) {
+        $group = self::get_year_group($group_id);
+        return $group ? $group['name'] : '';
     }
 }

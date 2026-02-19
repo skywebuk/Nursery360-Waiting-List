@@ -65,30 +65,58 @@ class NWL_Stats {
     }
 
     /**
-     * Get counts by age group
+     * Get counts by age group (legacy)
      */
     public function get_counts_by_age_group() {
         global $wpdb;
-        
+
         $table = $wpdb->prefix . NWL_TABLE_ENTRIES;
-        
+
         $results = $wpdb->get_results(
-            "SELECT age_group, COUNT(*) as count FROM $table 
-            WHERE status NOT IN ('removed', 'declined')
+            "SELECT age_group, COUNT(*) as count FROM $table
+            WHERE status NOT IN ('withdrawn')
             GROUP BY age_group",
             OBJECT_K
         );
-        
+
         $counts = array();
         $age_groups = NWL_Database::get_age_groups();
-        
+
         foreach ($age_groups as $key => $label) {
             $counts[$key] = array(
                 'label' => $label,
                 'count' => isset($results[$key]) ? (int) $results[$key]->count : 0,
             );
         }
-        
+
+        return $counts;
+    }
+
+    /**
+     * Get counts by year group
+     */
+    public function get_counts_by_year_group() {
+        global $wpdb;
+
+        $table = $wpdb->prefix . NWL_TABLE_ENTRIES;
+
+        $results = $wpdb->get_results(
+            "SELECT year_group, COUNT(*) as count FROM $table
+            WHERE status NOT IN ('withdrawn')
+            GROUP BY year_group",
+            OBJECT_K
+        );
+
+        $counts = array();
+        $year_groups = NWL_Database::get_year_groups();
+
+        foreach ($year_groups as $group) {
+            $counts[$group['id']] = array(
+                'label' => $group['name'],
+                'count' => isset($results[$group['id']]) ? (int) $results[$group['id']]->count : 0,
+            );
+        }
+
         return $counts;
     }
 
@@ -100,10 +128,10 @@ class NWL_Stats {
         
         $table = $wpdb->prefix . NWL_TABLE_ENTRIES;
         
-        // Calculate average for active entries
+        // Calculate average for active entries only
         $average = $wpdb->get_var(
-            "SELECT AVG(DATEDIFF(NOW(), created_at)) FROM $table 
-            WHERE status NOT IN ('removed', 'declined', 'enrolled')"
+            "SELECT AVG(DATEDIFF(NOW(), created_at)) FROM $table
+            WHERE status IN ('pending', 'waitlisted', 'offered')"
         );
         
         return $average ? round($average, 1) : 0;
@@ -194,22 +222,22 @@ class NWL_Stats {
         $offered = (int) $wpdb->get_var(
             "SELECT COUNT(*) FROM $table WHERE status = 'offered'"
         );
-        
-        $accepted = (int) $wpdb->get_var(
-            "SELECT COUNT(*) FROM $table WHERE status IN ('accepted', 'enrolled')"
+
+        $enrolled = (int) $wpdb->get_var(
+            "SELECT COUNT(*) FROM $table WHERE status = 'enrolled'"
         );
-        
-        $declined = (int) $wpdb->get_var(
-            "SELECT COUNT(*) FROM $table WHERE status = 'declined'"
+
+        $withdrawn = (int) $wpdb->get_var(
+            "SELECT COUNT(*) FROM $table WHERE status = 'withdrawn'"
         );
-        
-        $total_decisions = $accepted + $declined;
-        $conversion_rate = $total_decisions > 0 ? round(($accepted / $total_decisions) * 100, 1) : 0;
-        
+
+        $total_decisions = $enrolled + $withdrawn;
+        $conversion_rate = $total_decisions > 0 ? round(($enrolled / $total_decisions) * 100, 1) : 0;
+
         return array(
             'offered' => $offered,
-            'accepted' => $accepted,
-            'declined' => $declined,
+            'enrolled' => $enrolled,
+            'withdrawn' => $withdrawn,
             'pending_response' => $offered,
             'conversion_rate' => $conversion_rate,
         );
@@ -223,6 +251,7 @@ class NWL_Stats {
             'total_active' => $this->get_total_entries(true),
             'by_status' => $this->get_counts_by_status(),
             'by_age_group' => $this->get_counts_by_age_group(),
+            'by_year_group' => $this->get_counts_by_year_group(),
             'average_wait' => $this->get_average_waiting_time(),
             'monthly_trends' => $this->get_monthly_trends(6),
             'conversion' => $this->get_conversion_stats(),
@@ -267,7 +296,7 @@ class NWL_Stats {
         $high_priority = $wpdb->get_results(
             "SELECT * FROM $table
             WHERE priority IN ('high', 'urgent')
-            AND status NOT IN ('accepted', 'enrolled', 'removed', 'declined')
+            AND status NOT IN ('enrolled', 'withdrawn')
             ORDER BY FIELD(priority, 'urgent', 'high'), created_at ASC"
         );
         $attention['high_priority'] = $high_priority;
@@ -315,6 +344,8 @@ class NWL_Stats {
                 'id' => $group['id'],
                 'name' => $group['name'],
                 'capacity' => $group['capacity'],
+                'min_age' => isset($group['min_age']) ? $group['min_age'] : 0,
+                'max_age' => isset($group['max_age']) ? $group['max_age'] : 99,
                 'enrolled' => $enrolled,
                 'available' => max(0, $available),
                 'is_full' => $available <= 0,
@@ -348,6 +379,31 @@ class NWL_Stats {
             'unallocated' => $total_capacity - $total_allocated,
             'percentage' => $total_capacity > 0 ? round(($total_enrolled / $total_capacity) * 100, 1) : 0,
             'year_groups' => $year_group_occupancy,
+        );
+    }
+
+    /**
+     * Get total occupancy summary (simple version for display)
+     */
+    public function get_total_occupancy_summary() {
+        $year_group_occupancy = $this->get_year_group_occupancy();
+        $total_occupancy = absint(get_option('nwl_total_occupancy', 0));
+
+        $total_allocated = 0;
+        $total_enrolled = 0;
+
+        foreach ($year_group_occupancy as $group) {
+            $total_allocated += $group['capacity'];
+            $total_enrolled += $group['enrolled'];
+        }
+
+        // Use the configured total occupancy if set, otherwise fall back to sum of allocations
+        $total_capacity = $total_occupancy > 0 ? $total_occupancy : $total_allocated;
+
+        return array(
+            'total_capacity' => $total_capacity,
+            'total_enrolled' => $total_enrolled,
+            'total_available' => max(0, $total_capacity - $total_enrolled),
         );
     }
 }

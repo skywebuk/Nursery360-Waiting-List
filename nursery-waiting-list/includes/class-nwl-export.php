@@ -102,6 +102,7 @@ class NWL_Export {
             __('Declaration', 'nursery-waiting-list'),
             // Waiting List Details
             __('Age Group', 'nursery-waiting-list'),
+            __('Year Group', 'nursery-waiting-list'),
             __('Preferred Start Date', 'nursery-waiting-list'),
             __('Days Required', 'nursery-waiting-list'),
             __('Sessions Required', 'nursery-waiting-list'),
@@ -148,6 +149,7 @@ class NWL_Export {
                 $entry->declaration ? __('Yes', 'nursery-waiting-list') : __('No', 'nursery-waiting-list'),
                 // Waiting List Details
                 $entry->age_group,
+                $this->get_year_group_name($entry->year_group ?? ''),
                 $entry->preferred_start_date,
                 $entry->days_required,
                 $entry->sessions_required,
@@ -228,6 +230,8 @@ class NWL_Export {
             ),
             'preferences' => array(
                 'age_group' => $entry->age_group,
+                'year_group' => $entry->year_group ?? '',
+                'year_group_name' => $this->get_year_group_name($entry->year_group ?? ''),
                 'preferred_start_date' => $entry->preferred_start_date,
                 'days_required' => $entry->days_required,
                 'sessions_required' => $entry->sessions_required,
@@ -245,5 +249,16 @@ class NWL_Export {
                 'updated' => $entry->updated_at,
             ),
         );
+    }
+
+    /**
+     * Resolve year group ID to its display name
+     */
+    private function get_year_group_name($group_id) {
+        if (empty($group_id)) {
+            return '';
+        }
+        $group = NWL_Database::get_year_group($group_id);
+        return $group ? $group['name'] : $group_id;
     }
 }

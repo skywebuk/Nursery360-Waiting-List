@@ -58,15 +58,22 @@ class NWL_Email {
         }
 
         $entry = NWL_Entry::get_instance()->get($entry_id);
-        
+
         if (!$entry) {
             return;
         }
 
-        // Send offer email when status changes to 'offered'
-        if ($new_status === 'offered') {
-            $template = $this->get_template('place_offered');
-        } else {
+        // Find template by status_trigger column (admin-configurable)
+        $template = $this->get_template_by_status_trigger($new_status);
+
+        // Fall back to convention-based key lookup
+        if (!$template) {
+            $status_template_key = 'status_' . $new_status;
+            $template = $this->get_template($status_template_key);
+        }
+
+        // Final fallback to generic status_change template
+        if (!$template) {
             $template = $this->get_template('status_change');
         }
 
@@ -151,7 +158,7 @@ class NWL_Email {
     public function send($to, $subject, $body, $type, $entry_id = null, $template_id = null) {
         $from_name = get_option('nwl_email_from_name', get_bloginfo('name'));
         $from_email = get_option('nwl_email_from_address', get_option('admin_email'));
-        
+
         $headers = array(
             'Content-Type: text/html; charset=UTF-8',
             'From: ' . $from_name . ' <' . $from_email . '>',
@@ -162,12 +169,30 @@ class NWL_Email {
             $headers[] = 'Reply-To: ' . $reply_to;
         }
 
+        // Get attachments from template
+        $attachments = array();
+        if ($template_id) {
+            $template = $this->get_template_by_id($template_id);
+            if ($template && !empty($template->attachments)) {
+                $attachment_ids = json_decode($template->attachments, true);
+                if (is_array($attachment_ids)) {
+                    foreach ($attachment_ids as $attachment_id) {
+                        $file_path = get_attached_file($attachment_id);
+                        if ($file_path && file_exists($file_path)) {
+                            $attachments[] = $file_path;
+                        }
+                    }
+                }
+            }
+        }
+
         // Apply filters for customization
         $headers = apply_filters('nwl_email_headers', $headers, $type, $entry_id);
         $body = apply_filters('nwl_email_body', $body, $type, $entry_id);
         $subject = apply_filters('nwl_email_subject', $subject, $type, $entry_id);
+        $attachments = apply_filters('nwl_email_attachments', $attachments, $type, $entry_id, $template_id);
 
-        $sent = wp_mail($to, $subject, $body, $headers);
+        $sent = wp_mail($to, $subject, $body, $headers, $attachments);
 
         // Log the email
         $this->log_email(array(
@@ -187,11 +212,11 @@ class NWL_Email {
 
         // Add note to entry
         if ($entry_id) {
-            NWL_Entry::get_instance()->add_note(
-                $entry_id,
-                'email',
-                sprintf(__('Email sent: %s', 'nursery-waiting-list'), $subject)
-            );
+            $note_text = sprintf(__('Email sent: %s', 'nursery-waiting-list'), $subject);
+            if (!empty($attachments)) {
+                $note_text .= sprintf(__(' (with %d attachment(s))', 'nursery-waiting-list'), count($attachments));
+            }
+            NWL_Entry::get_instance()->add_note($entry_id, 'email', $note_text);
         }
 
         return true;
@@ -208,6 +233,20 @@ class NWL_Email {
         return $wpdb->get_row($wpdb->prepare(
             "SELECT * FROM $table WHERE template_key = %s AND is_active = 1",
             $key
+        ));
+    }
+
+    /**
+     * Get email template by status_trigger value
+     */
+    public function get_template_by_status_trigger($status) {
+        global $wpdb;
+
+        $table = $wpdb->prefix . NWL_TABLE_TEMPLATES;
+
+        return $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM $table WHERE status_trigger = %s AND is_active = 1 ORDER BY id ASC LIMIT 1",
+            $status
         ));
     }
 
@@ -241,13 +280,13 @@ class NWL_Email {
      */
     public function update_template($id, $data) {
         global $wpdb;
-        
+
         $table = $wpdb->prefix . NWL_TABLE_TEMPLATES;
-        
-        $allowed = array('template_name', 'subject', 'body', 'is_active');
+
+        $allowed = array('template_name', 'subject', 'body', 'status_trigger', 'attachments', 'is_active');
         $update_data = array_intersect_key($data, array_flip($allowed));
         $update_data['updated_at'] = current_time('mysql');
-        
+
         return $wpdb->update($table, $update_data, array('id' => $id));
     }
 
@@ -320,6 +359,7 @@ class NWL_Email {
             '{{parent_mobile}}' => $entry->parent_mobile,
             '{{date_added}}' => date_i18n(get_option('date_format'), strtotime($entry->created_at)),
             '{{age_group}}' => $entry->age_group,
+            '{{year_group}}' => $this->get_year_group_display_name($entry),
             '{{preferred_start_date}}' => $entry->preferred_start_date ? date_i18n(get_option('date_format'), strtotime($entry->preferred_start_date)) : '',
             '{{status}}' => $entry_handler->get_status_label($entry->status),
             '{{public_notes}}' => $entry->public_notes,
@@ -344,6 +384,18 @@ class NWL_Email {
 
         // Replace placeholders
         return str_replace(array_keys($replacements), array_values($replacements), $template);
+    }
+
+    /**
+     * Resolve year group ID to display name for email templates
+     */
+    private function get_year_group_display_name($entry) {
+        $group_id = isset($entry->year_group) ? $entry->year_group : '';
+        if (empty($group_id)) {
+            return '';
+        }
+        $group = NWL_Database::get_year_group($group_id);
+        return $group ? $group['name'] : $group_id;
     }
 
     /**
@@ -458,6 +510,7 @@ class NWL_Email {
                 '{{parent_mobile}}' => __('Parent/carer\'s mobile number', 'nursery-waiting-list'),
                 '{{date_added}}' => __('Date added to waiting list', 'nursery-waiting-list'),
                 '{{age_group}}' => __('Age group', 'nursery-waiting-list'),
+                '{{year_group}}' => __('Year group name', 'nursery-waiting-list'),
                 '{{preferred_start_date}}' => __('Preferred start date', 'nursery-waiting-list'),
                 '{{status}}' => __('Current status', 'nursery-waiting-list'),
                 '{{public_notes}}' => __('Public notes (visible to parents/carers)', 'nursery-waiting-list'),

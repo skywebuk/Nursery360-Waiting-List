@@ -166,9 +166,14 @@ class NWL_Gravity_Forms {
             }
         }
 
-        // Auto-calculate age group from child's date of birth
+        // Auto-calculate age group and year group from child's date of birth
         if (!empty($data['child_dob'])) {
             $data['age_group'] = $this->calculate_age_group($data['child_dob']);
+            // Also auto-calculate year group based on configured year groups
+            $year_group = NWL_Database::calculate_year_group_from_dob($data['child_dob']);
+            if ($year_group) {
+                $data['year_group'] = $year_group;
+            }
         }
 
         // Apply filters for custom mapping

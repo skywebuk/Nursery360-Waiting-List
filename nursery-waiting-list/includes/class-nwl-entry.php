@@ -175,6 +175,20 @@ class NWL_Entry {
     }
 
     /**
+     * Get entry by waiting list number
+     */
+    public function get_by_wl_number($wl_number) {
+        global $wpdb;
+
+        $table = $wpdb->prefix . NWL_TABLE_ENTRIES;
+
+        return $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM $table WHERE waiting_list_number = %s",
+            $wl_number
+        ));
+    }
+
+    /**
      * Get entries with filters
      */
     public function get_entries($args = array()) {
@@ -183,6 +197,7 @@ class NWL_Entry {
         $defaults = array(
             'status' => '',
             'age_group' => '',
+            'year_group' => '',
             'priority' => '',
             'date_from' => '',
             'date_to' => '',
@@ -215,6 +230,11 @@ class NWL_Entry {
         if (!empty($args['age_group'])) {
             $where[] = 'age_group = %s';
             $values[] = $args['age_group'];
+        }
+
+        if (!empty($args['year_group'])) {
+            $where[] = 'year_group = %s';
+            $values[] = $args['year_group'];
         }
 
         if (!empty($args['priority'])) {
