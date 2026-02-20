@@ -19,7 +19,7 @@ class NWL_Database {
     }
 
     private function __construct() {
-        add_action('plugins_loaded', array($this, 'check_db_version'));
+        $this->check_db_version();
     }
 
     /**
